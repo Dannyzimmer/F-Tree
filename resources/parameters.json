@@ -1,0 +1,7 @@
+{
+    "database": "resources/database/database.db",
+    "language_dir": "resources/lang/",
+    "color_file": "resources/style/colors.json",
+    "font_file":"resources/style/fonts.json",
+    "language": "ES"
+}

@@ -1,0 +1,7 @@
+{
+    "big": ["Arial", 18],
+    "medium": ["Arial", 12],
+    "name": ["Arial", 18, "bold"],
+    "year": ["Arial", 12],
+    "fcode": ["Arial", 13, "italic"]
+}
