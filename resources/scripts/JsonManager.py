@@ -25,33 +25,56 @@ class JsonManager:
         self._remove_attributes()
         self._add_attributes_from_dict(data)
 
-class LangManager(JsonManager):
-    def __init__(self, language, parameters_file):
+class GenericManager(JsonManager):
+    def __init__(self, parameter_manager: object, json_to_load: str):
+        self.params = parameter_manager
+        super().__init__(json_to_load)
+
+class LangManager(GenericManager):
+    def __init__(self, parameter_manager: object):
         '''Class for managing the language of the GUI. Attributes are the
         keys of the selected dictionary.
         '''
-        self._parameters_file = parameters_file
-        super().__init__(self._get_language_filepath(language))
+        self.params = parameter_manager
+        json_to_load = self._get_language_filepath()
+        super().__init__(parameter_manager, json_to_load)
+
+    def _get_current_language(self):
+        return self.params.language
+    
+    def _get_language_dir(self):
+        return self.params.language_dir
+    
+    def _get_current_language_filename(self):
+        language = self._get_current_language()
+        lang_dir = self._get_language_dir()
+        return load_json(f'{lang_dir}/filenames.json')[language]
 
     def load_language(self, lang_file):
         self.load_new_json(lang_file)
 
-    def _get_language_filepath(self, language):
-        lang_dir = load_json(self._parameters_file)['language_dir']
-        filename = load_json(f'{lang_dir}/filenames.json')[language]
+    def _get_language_filepath(self):
+        lang_dir = self._get_language_dir()
+        filename = self._get_current_language_filename()
         return lang_dir + '/' + filename
 
-class ColorManager(JsonManager):
+class ColorManager(GenericManager):
     '''Class for managing color of the GUI. Attributes are the keys of the
     selected dictionary.'''
-    def __init__(self, color_file):
-        super().__init__(color_file)
+    def __init__(self, parameter_manager: object):
+        self.params = parameter_manager
+        json_to_load = self._get_color_file()
+        super().__init__(parameter_manager, json_to_load)
 
-class FontManager(JsonManager):
+    def _get_color_file(self):
+        return self.params.color_file
+
+class FontManager(GenericManager):
     '''Class for managing fonts of the GUI. Attributes are the keys of the
     selected dictionary.'''
-    def __init__(self, font_file):
-        self.load_new_json(font_file)
+    def __init__(self, parameter_manager: object):
+        self.params = parameter_manager
+        self.load_new_json(self.params.font_file)
 
     def _add_attributes_from_dict(self, dict):
         for key in dict:

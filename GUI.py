@@ -12,16 +12,16 @@ import os
 import json
 
 parameter_path = 'resources/parameters.json'
-parameter = ParameterManager(parameter_path)
-db_path = parameter.database
-lang = LangManager(parameter.language, parameter_path)
-color = ColorManager(parameter.color_file)
-font = FontManager(parameter.font_file)
+params = ParameterManager(parameter_path)
+color = ColorManager(params) #FIXME: end the refactoring the code
 
 class App:
-    def __init__(self, root, db_path):
+    def __init__(self, root, launch_data):
         self.root = root
-        self.db_path = db_path
+        self.db_path = launch_data.params.database
+        self.launch_data = launch_data
+        self.lang = launch_data.lang_manager
+        self.font = launch_data.font_manager
         # self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.db = Database(self.db_path)
 
@@ -32,10 +32,10 @@ class App:
         # Tab view
         self.tabview = tk.CTkTabview(self.root, width=600)
         self.tabview.grid(sticky='NEWS', row = 0, column = 1, padx = (2, 10), pady = 5)
-        edit_tab = lang.tab_edit
-        add_tab = lang.tab_add
-        info_tab = lang.tab_info
-        db_tab = lang.database
+        edit_tab = self.lang.tab_edit
+        add_tab = self.lang.tab_add
+        info_tab = self.lang.tab_info
+        db_tab = self.lang.database
         self.tabview.add(info_tab)
         self.tabview.add(edit_tab)
         self.tabview.add(add_tab)
@@ -65,15 +65,15 @@ class App:
         self.selected_year = None
 
         # Widgets Edit Tab
-        self.name_entry = LabelEntry(self.tabview.tab(edit_tab), lang.name, 0, 0)
-        self.name_entry.entry.configure(width = 250, placeholder_text = lang.name)
-        self.nickname = LabelEntry(self.tabview.tab(edit_tab), lang.nickname, 1, 0)
-        self.year = LabelEntry(self.tabview.tab(edit_tab), lang.year, 2, 0)
-        self.biography = LabelTextbox(self.tabview.tab(edit_tab), lang.biography, 3, 0)
+        self.name_entry = LabelEntry(self.tabview.tab(edit_tab), self.lang.name, 0, 0)
+        self.name_entry.entry.configure(width = 250, placeholder_text = self.lang.name)
+        self.nickname = LabelEntry(self.tabview.tab(edit_tab), self.lang.nickname, 1, 0)
+        self.year = LabelEntry(self.tabview.tab(edit_tab), self.lang.year, 2, 0)
+        self.biography = LabelTextbox(self.tabview.tab(edit_tab), self.lang.biography, 3, 0)
         self.biography.textbox.configure(width = self.biography_width, height = self.biography_height)
         self.table_focus = self.table.tree.item(self.table.tree.selection())
-        self.save_button = tk.CTkButton(self.edit_tab_button_frame, text=lang.save, command = self.save_entries_edit)
-        self.del_button = tk.CTkButton(self.edit_tab_button_frame, text=lang.delete, command=self.delete_row_edit, fg_color='#D55B5B')
+        self.save_button = tk.CTkButton(self.edit_tab_button_frame, text=self.lang.save, command = self.save_entries_edit)
+        self.del_button = tk.CTkButton(self.edit_tab_button_frame, text=self.lang.delete, command=self.delete_row_edit, fg_color='#D55B5B')
         self.save_button.grid(sticky = 'NE', row = 4, column = 0, padx = 10, pady = 10)
         self.del_button.grid(sticky = 'NE', row = 4, column = 1, padx = 10, pady = 10)
 
@@ -81,59 +81,59 @@ class App:
         self.name_fcode_addt_frame = tk.CTkFrame(self.tabview.tab(add_tab))
         self.name_fcode_addt_frame.grid_columnconfigure(0, weight=2)
         self.name_fcode_addt_frame.grid(sticky='NEWS', row=0, column=0, columnspan=2)
-        self.name_entry_addt = LabelEntry(self.name_fcode_addt_frame, lang.name, 0, 0)
+        self.name_entry_addt = LabelEntry(self.name_fcode_addt_frame, self.lang.name, 0, 0)
         self.name_entry_addt.entry.configure(width = 200)
         self.fcode_entry_addt = LabelEntry(self.name_fcode_addt_frame, "Fcode", 0, 1)
-        self.nickname_addt = LabelEntry(self.tabview.tab(add_tab), lang.nickname, 2, 0)
-        self.year_addt = LabelEntry(self.tabview.tab(add_tab), lang.year, 3, 0)
-        self.biography_addt = LabelTextbox(self.tabview.tab(add_tab), lang.biography, 4, 0)
+        self.nickname_addt = LabelEntry(self.tabview.tab(add_tab), self.lang.nickname, 2, 0)
+        self.year_addt = LabelEntry(self.tabview.tab(add_tab), self.lang.year, 3, 0)
+        self.biography_addt = LabelTextbox(self.tabview.tab(add_tab), self.lang.biography, 4, 0)
         self.biography_addt.textbox.configure(width = self.biography_width, height = self.biography_height - 30)
-        self.save_button = tk.CTkButton(self.tabview.tab(add_tab), text=lang.save, command = self.save_entries_add)
+        self.save_button = tk.CTkButton(self.tabview.tab(add_tab), text=self.lang.save, command = self.save_entries_add)
         self.save_button.grid(sticky = 'NE', row = 5, column = 0, padx = 10, pady = 10)
 
         # Widgets Information Tab
         self.info_header_frame = tk.CTkFrame(self.tabview.tab(info_tab), fg_color='gray20')
-        self.info_self_label = tk.CTkLabel(self.info_header_frame, text="NA", font=font.name, text_color=color.blue_gray)
+        self.info_self_label = tk.CTkLabel(self.info_header_frame, text="NA", font=self.font.name, text_color=color.blue_gray)
         self.info_header_frame.grid(sticky='NEWS', row=0, column=0, padx = 5, pady = (10, 10))
         self.info_self_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=(10,0))
 
         self.year_fcode_frame = tk.CTkFrame(self.info_header_frame, fg_color='gray20')
-        self.info_fcode_label = tk.CTkLabel(self.year_fcode_frame, text="", font=font.fcode, text_color='gray60')
-        self.info_year_label = tk.CTkLabel(self.year_fcode_frame, text="NA", font=font.year, text_color='gray80')
+        self.info_fcode_label = tk.CTkLabel(self.year_fcode_frame, text="", font=self.font.fcode, text_color='gray60')
+        self.info_year_label = tk.CTkLabel(self.year_fcode_frame, text="NA", font=self.font.year, text_color='gray80')
         self.year_fcode_frame.grid(sticky='NEWS', row=1, column=0, padx = 10, pady = (0, 10))
         self.info_year_label.grid(sticky='NWS', row=0, column=0, padx=(0,10), pady=1)
         self.info_fcode_label.grid(sticky='NSE', row=0, column=1, padx=10, pady=1)
 
-        self.info_spouse_label = tk.CTkLabel(self.tabview.tab(info_tab), text = lang.spouse.capitalize())
+        self.info_spouse_label = tk.CTkLabel(self.tabview.tab(info_tab), text = self.lang.spouse.capitalize())
         self.info_spouse_entry = tk.CTkEntry(self.tabview.tab(info_tab))
         self.info_spouse_label.grid(sticky='NWS', row=2, column=0, padx=10, pady=(0,5))
         self.info_spouse_entry.grid(sticky='NWS', row=3, column=0, padx=15, pady=(0,5))        
 
-        self.info_parents_label = tk.CTkLabel(self.tabview.tab(info_tab), text = lang.parents.capitalize())
+        self.info_parents_label = tk.CTkLabel(self.tabview.tab(info_tab), text = self.lang.parents.capitalize())
         self.info_mother_entry = LabelEntry(self.tabview.tab(info_tab), "", 6, 0, show_label=False)
         self.info_father_entry = LabelEntry(self.tabview.tab(info_tab), "", 7, 0, show_label=False)
         self.info_parents_label.grid(sticky='W', row=4, column=0, padx = 10, pady = (12,0), columnspan = 2)
-        self.info_mother_entry.entry.configure(placeholder_text=lang.mother, width = 250)
-        self.info_father_entry.entry.configure(placeholder_text=lang.father, width = 250)
+        self.info_mother_entry.entry.configure(placeholder_text=self.lang.mother, width = 250)
+        self.info_father_entry.entry.configure(placeholder_text=self.lang.father, width = 250)
         self.info_father_entry.frame.grid(pady=0)
-        self.info_spouse_entry.configure(placeholder_text=lang.spouse, width = 250)
+        self.info_spouse_entry.configure(placeholder_text=self.lang.spouse, width = 250)
 
-        columns = [lang.name, lang.sibling_number]
+        columns = [self.lang.name, self.lang.sibling_number]
         siblings = ()
-        self.info_siblings_tree = LabelTable(self.tabview.tab(info_tab), lang.siblings, 8, 0, columns=columns, data=siblings, show_label = True)
+        self.info_siblings_tree = LabelTable(self.tabview.tab(info_tab), self.lang.siblings, 8, 0, columns=columns, data=siblings, show_label = True)
         self.info_siblings_tree.label.grid(sticky='W')
-        self.info_siblings_tree.tree.column(lang.name, width=250)
+        self.info_siblings_tree.tree.column(self.lang.name, width=250)
         self.info_siblings_tree.tree.configure(height=8)
         self.info_siblings_tree.frame.grid(padx=0)
         self.info_siblings_tree.tree.grid(padx=15)
         self.info_siblings_tree.label.grid(pady=(12,0))
 
-        columns_off = [lang.name, lang.offspring_number]
+        columns_off = [self.lang.name, self.lang.offspring_number]
         siblings_off = ()
-        self.info_offspring_tree = LabelTable(self.tabview.tab(info_tab), lang.offspring, 9, 0, 
+        self.info_offspring_tree = LabelTable(self.tabview.tab(info_tab), self.lang.offspring, 9, 0, 
             columns=columns_off, data=siblings_off, show_label = True)
         self.info_offspring_tree.label.grid(sticky='W')
-        self.info_offspring_tree.tree.column(lang.name, width=250)
+        self.info_offspring_tree.tree.column(self.lang.name, width=250)
         self.info_offspring_tree.tree.configure(height=8)
         self.info_offspring_tree.frame.grid(padx=0)
         self.info_offspring_tree.tree.grid(padx=15)
@@ -145,24 +145,24 @@ class App:
             # import
         self.db_import_frame = tk.CTkFrame(self.db_tab_frame)
         self.db_import_frame.grid(sticky='NEWS', row=0, column=0, padx=10, pady=5)
-        self.db_import_menu = tk.CTkOptionMenu(self.db_import_frame, values=[lang.from_sqlite, lang.from_tsv], width=180)
-        self.db_import_label = tk.CTkLabel(self.db_import_frame, text=lang._import)
-        self.db_import_button = tk.CTkButton(self.db_import_frame, text=lang._import, command=self.import_button)
+        self.db_import_menu = tk.CTkOptionMenu(self.db_import_frame, values=[self.lang.from_sqlite, self.lang.from_tsv], width=180)
+        self.db_import_label = tk.CTkLabel(self.db_import_frame, text=self.lang._import)
+        self.db_import_button = tk.CTkButton(self.db_import_frame, text=self.lang._import, command=self.import_button)
         self.db_import_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=5)
         self.db_import_menu.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
         self.db_import_button.grid(sticky='NWS', row=0, column=2, padx=10, pady=5)
             # export
         self.db_export_frame = tk.CTkFrame(self.db_tab_frame)
         self.db_export_frame.grid(sticky='NEWS', row=1, column=0, padx=10, pady=5)
-        self.db_export_menu = tk.CTkOptionMenu(self.db_export_frame, values=[lang.to_sqlite, lang.to_tsv], width=180)
-        self.db_export_label = tk.CTkLabel(self.db_export_frame, text=lang.export)
-        self.db_export_button = tk.CTkButton(self.db_export_frame, text=lang.export, command=self.export_button)
+        self.db_export_menu = tk.CTkOptionMenu(self.db_export_frame, values=[self.lang.to_sqlite, self.lang.to_tsv], width=180)
+        self.db_export_label = tk.CTkLabel(self.db_export_frame, text=self.lang.export)
+        self.db_export_button = tk.CTkButton(self.db_export_frame, text=self.lang.export, command=self.export_button)
         self.db_export_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=5)
         self.db_export_menu.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
         self.db_export_button.grid(sticky='NWS', row=0, column=2, padx=10, pady=5)
 
         # self.info_siblings_label.grid(sticky='W', row=3, column=0, padx = 10, pady = 5, columnspan = 2)
-        # self.name_entry_infot = LabelEntry(self.tabview.tab(info_tab), lang.father, 0, 0)
+        # self.name_entry_infot = LabelEntry(self.tabview.tab(info_tab), self.lang.father, 0, 0)
         
         self.tabview.set(info_tab)
     
@@ -244,7 +244,7 @@ class App:
     def load_table(self):
         table_columns = ["Fcode", "Name", "Nickname", "Biography", "Year Born", "Notes"]
         table_data = self.db.table_shown
-        self.table = LabelTable(self.left_frame, lang.table, 0, 0, columns=table_columns, data=table_data)
+        self.table = LabelTable(self.left_frame, self.lang.table, 0, 0, columns=table_columns, data=table_data)
         self.table.tree.bind('<<TreeviewSelect>>', self.refresh_selection)
         # self.table.tree.selection_set(self.table.tree.get_children()[0])
         self.table.tree.configure(height=40)
@@ -260,7 +260,7 @@ class App:
         # Search box
         self.search_autocom = AutocompleteEntry(self.search_frame, completevalues=column_values, width=30)
         self.search_autocom.grid(sticky='E', row=0, column=0, columnspan=3)
-        self.search_button = tk.CTkButton(self.search_frame, text=lang.search, width=12, command=self.go_search_button)
+        self.search_button = tk.CTkButton(self.search_frame, text=self.lang.search, width=12, command=self.go_search_button)
         self.search_button.grid(sticky='E', row=0, column=4, padx = 10, pady = 5)
         # self.search_autocom.bind('<<ComboboxSelected>>', self.go_search_button)
         self.search_autocom.bind("<Return>", self.go_search_button)
@@ -306,7 +306,7 @@ class App:
         row = self.get_row_from_add_tab()
         if row != ('','','','','',''):
             if row[0] == "":
-                messagebox.showwarning(self.root, message = lang.empty_fcode_error)
+                messagebox.showwarning(self.root, message = self.lang.empty_fcode_error)
             else:
                 self.selected_fcode = row[0]
                 self.db.insert_row(row)
@@ -314,7 +314,7 @@ class App:
         self.clear_widgets_add()
     
     def delete_row_edit(self):
-        answer = messagebox.askokcancel(message=lang.del_confirmation)
+        answer = messagebox.askokcancel(message=self.lang.del_confirmation)
         if answer:
             self.db.delete_row(self.selected_fcode)
             self.refresh_table()
@@ -337,13 +337,13 @@ class App:
         
     def import_button(self):
         option = self.db_import_menu.get()
-        if option == lang.from_sqlite:
+        if option == self.lang.from_sqlite:
             db_file = tk.filedialog.askopenfile(mode ='r', filetypes =[('SQLite DB', '*.db')]).name
             self.db_path = db_file
             self.db = Database(self.db_path)
             self.refresh_table()
             self.refresh_selection()
-        elif option == lang.from_tsv:
+        elif option == self.lang.from_tsv:
             self.db.close()
             db_file = tk.filedialog.askopenfile(mode ='r', filetypes =[('SQLite DB', '*.tsv')]).name
             filename = os.path.splitext(os.path.basename(db_file))[0] + '_auto.db'
@@ -359,12 +359,12 @@ class App:
 
     def export_button(self):
         option = self.db_export_menu.get()
-        if option == lang.to_sqlite:
+        if option == self.lang.to_sqlite:
             db_file = tk.filedialog.asksaveasfilename(defaultextension=".db", filetypes=[('SQLite DB', '*.db')])
             if db_file:
                 self.db.export_to_sqlite(db_file)
                 print(f'Database exported to {db_file}')
-        elif option == lang.to_tsv:
+        elif option == self.lang.to_tsv:
             tsv_file = tk.filedialog.asksaveasfilename(defaultextension=".tsv", filetypes=[('TSV files', '*.tsv')])
             if tsv_file:
                 self.db.export_to_tsv(tsv_file)
@@ -378,9 +378,12 @@ class App:
     #     self.db.close()
     #     self.root.destroy()
 
-if __name__ == "__main__":
+def launch(launch_data):
     root = tk.CTk()
     root.title("Fcode Tools")
     root.resizable(True, True)
-    app = App(root, db_path)
+    app = App(root, launch_data)
     root.mainloop()
+
+if __name__ == "__main__":
+    launch()
