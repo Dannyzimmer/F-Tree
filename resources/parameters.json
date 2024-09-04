@@ -1,5 +1,5 @@
 {
-    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/resources/database/database.db",
+    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/familia.db",
     "language_dir": "resources/lang/",
     "image_dir": "resources/img/",
     "color_file": "resources/style/colors.json",

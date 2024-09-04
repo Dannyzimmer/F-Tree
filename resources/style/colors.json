@@ -10,5 +10,6 @@
     "green": "#74BD71",
     "console_green": "#8EDA8D",
     "console_selection": "#5B93C8",
-    "frame_background": "gray20"
+    "frame_background": "gray20",
+    "frame_foreground": "gray80"
 }

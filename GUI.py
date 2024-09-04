@@ -263,7 +263,10 @@ class App:
 
         # Search frame
         column_values = get_column_values(self.table.tree, 1)
-        self.search_frame = tk.CTkFrame(self.table.frame, fg_color=color.frame_background)
+        self.search_frame = tk.CTkFrame(self.table.frame,
+                                        fg_color=(
+                                            color.frame_foreground,
+                                            color.frame_background))
         self.search_frame.grid(sticky='E', row=0, column = 1, columnspan=3)
         
         # Search box
