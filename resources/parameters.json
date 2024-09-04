@@ -1,7 +1,9 @@
 {
-    "database": "resources/database/database.db",
+    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/resources/database/database.db",
     "language_dir": "resources/lang/",
+    "image_dir": "resources/img/",
     "color_file": "resources/style/colors.json",
-    "font_file":"resources/style/fonts.json",
+    "font_file": "resources/style/fonts.json",
+    "image_file": "resources/style/images.json",
     "language": "ES"
 }

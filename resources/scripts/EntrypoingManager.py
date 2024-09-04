@@ -1,5 +1,5 @@
 import os
-from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager
+from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager, ImageManager
 
 class EntrypoingManager:
     def __init__(self, parameter_manager: object):
@@ -22,3 +22,4 @@ class LaunchData:
         self.lang_manager = LangManager(self.params)
         self.color_manager = ColorManager(self.params)
         self.font_manager = FontManager(self.params)
+        self.image_manager = ImageManager(self.params)

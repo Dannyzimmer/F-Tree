@@ -8,6 +8,7 @@ from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
 from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
 from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager
+from PIL import Image
 import os
 import json
 
@@ -19,6 +20,7 @@ class App:
     def __init__(self, root, launch_data):
         self.root = root
         self.db_path = launch_data.params.database
+        self.db_filename = os.path.basename(self.db_path)
         self.launch_data = launch_data
         self.lang = launch_data.lang_manager
         self.font = launch_data.font_manager
@@ -244,7 +246,14 @@ class App:
     def load_table(self):
         table_columns = ["Fcode", "Name", "Nickname", "Biography", "Year Born", "Notes"]
         table_data = self.db.table_shown
-        self.table = LabelTable(self.left_frame, self.lang.table, 0, 0, columns=table_columns, data=table_data)
+        table_name = f'   {self.db_filename}'
+        icon = tk.CTkImage(
+            light_image=Image.open(self.launch_data.image_manager.database_icon),
+            size=(15, 15)
+            )
+        self.table = LabelTable(self.left_frame, table_name, 0, 0,
+                                columns=table_columns, data=table_data,
+                                image=icon, compound='left')
         self.table.tree.bind('<<TreeviewSelect>>', self.refresh_selection)
         # self.table.tree.selection_set(self.table.tree.get_children()[0])
         self.table.tree.configure(height=40)
@@ -277,6 +286,7 @@ class App:
                 break
     
     def refresh_table(self):
+        self.launch_data.params.write_param('database', self.db_path)
         self.db.update_table_shown()
         self.load_table()
         self.select_tree_by_fcode(self.selected_fcode)
@@ -334,12 +344,16 @@ class App:
         self.table.subset_table(pattern=pattern, column=1)
         self.select_first_row()
         self.refresh_selection()
-        
+    
+    def _refresh_db_filename(self):
+        self.db_filename = os.path.basename(self.db_path)
+
     def import_button(self):
         option = self.db_import_menu.get()
         if option == self.lang.from_sqlite:
             db_file = tk.filedialog.askopenfile(mode ='r', filetypes =[('SQLite DB', '*.db')]).name
             self.db_path = db_file
+            self._refresh_db_filename()
             self.db = Database(self.db_path)
             self.refresh_table()
             self.refresh_selection()

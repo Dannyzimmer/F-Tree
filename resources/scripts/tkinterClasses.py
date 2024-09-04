@@ -15,7 +15,7 @@ class LabelWidget:
         self.frame.grid(sticky='NWES', row=row, column=col, columnspan=2, padx=10, pady=5)
         if self.show_label == True:
             # Label
-            self.label = tk.CTkLabel(self.frame, text=self.label_text, width=self.label_width)
+            self.label = tk.CTkLabel(self.frame, text=self.label_text, width=self.label_width, **kwargs)
             self.label.grid(sticky='NW', row=0, column=0, padx=10, pady=5)
 
 class LabelEntry(LabelWidget):
