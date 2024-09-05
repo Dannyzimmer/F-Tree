@@ -1,5 +1,8 @@
 import json
 import os
+from customtkinter import CTkImage
+from PIL import Image
+
 
 def load_json(json_file):
     with open(json_file) as f:
@@ -35,11 +38,15 @@ class JsonManager:
         with open(self._json_file, 'w') as f:
             json.dump(self._data, f, indent = 4)
 
+    def refresh(self):
+        self._data = load_json(self._json_file)
+        self._add_attributes_from_dict(self._data)
+
 class GenericManager(JsonManager):
     def __init__(self, parameter_manager: object, json_to_load: str):
         self.params = parameter_manager
         super().__init__(json_to_load)
-
+    
 class LangManager(GenericManager):
     def __init__(self, parameter_manager: object):
         '''Class for managing the language of the GUI. Attributes are the
@@ -67,6 +74,9 @@ class LangManager(GenericManager):
         lang_dir = self._get_language_dir()
         filename = self._get_current_language_filename()
         return lang_dir + '/' + filename
+    
+    def get_available_languages(self)-> list:
+        return list(load_json(self.params.available_languages_file).keys())
 
 class ColorManager(GenericManager):
     '''Class for managing color of the GUI. Attributes are the keys of the
@@ -106,12 +116,21 @@ class ImageManager(GenericManager):
             img_path = os.path.realpath(self.params.image_dir + '/' + dict[key])
             setattr(self, key, img_path)
 
+    def get_image(self, image_name, width = 15, height = 15)-> CTkImage:
+        return CTkImage(
+            light_image=Image.open(self.__getattribute__(image_name)),
+            size=(width, height)
+            )
+
 class ParameterManager(JsonManager):
     '''Class for managing the parameter file of the GUI. Attributes are the keys
     of the selected dictionary.'''
     def __init__(self, parameters_file):
         super().__init__(parameters_file)
+        self.params_path = parameters_file
     
     def write_param(self, param_name, value):
         self.set_field_to_value(param_name, value)
         self.write_params_to_file()
+        self.refresh()
+        

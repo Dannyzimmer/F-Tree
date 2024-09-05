@@ -1,5 +1,5 @@
 from resources.scripts.EntrypoingManager import EntrypoingManager
-from resources.scripts.JsonManager import ParameterManager, LangManager
+from resources.scripts.JsonManager import ParameterManager
 
 parameter_path = 'resources/parameters.json'
 parameter = ParameterManager(parameter_path)

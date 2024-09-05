@@ -6,13 +6,16 @@ class EntrypoingManager:
         self.params = parameter_manager
         self.launch_data = LaunchData(self.params)
 
-        if self.is_database_avail():
-            import GUI
-            GUI.launch(self.launch_data)
-        else:
+        # Show Welcome Menu if no database or welcome_menu = True
+        if not self.is_database_avail() or self.params.welcome_menu == "True":
             from resources.scripts import welcome_menu
             welcome_menu.launch(self.launch_data)
-
+            
+        else:
+            import GUI
+            GUI.launch(self.launch_data)
+        
+        
     def is_database_avail(self):
         return os.path.exists(self.params.database)
 

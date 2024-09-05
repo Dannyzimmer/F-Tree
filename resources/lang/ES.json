@@ -8,6 +8,7 @@
     "tab_add": "Añadir",
     "tab_info": "Información",
     "save": "Guardar",
+    "exit": "Salir",
     "delete": "Eliminar",
     "spouse": "Cónyuge",
     "father": "Padre",
@@ -26,5 +27,11 @@
     "empty_fcode_error": "Campo \"Fcode\" vacío. Por favor, cúbrelo antes de guardar la entrada.",
     "del_confirmation": "Esta acción eliminará la entrada actual.",
     "sibling_number": "Nº Herman@",
-    "offspring_number": "Nº Hij@"
+    "offspring_number": "Nº Hij@",
+    "new_family_btn": "Nueva familia",
+    "import_family_btn": "Importar familia",
+    "sqlite_file": "Archivo SQLite",
+    "fdata_file": "Archivo Fdata",
+    "tsv_file": "Archivo TSV",
+    "all_files": "Todos los archivos"
 }

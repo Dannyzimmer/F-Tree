@@ -1,4 +1,4 @@
-#!/usr/bin/env python3﻿
+#!/usr/bin/env python3
 import customtkinter as tk
 from tkinter import messagebox
 from resources.scripts.Database import create_table_from_tsv, load_data_from_tsv, convert_tsv_to_sqlite
@@ -397,7 +397,7 @@ class App:
 
 def launch(launch_data):
     root = tk.CTk()
-    root.title("Fcode Tools")
+    root.title(launch_data.params.software_name)
     root.resizable(True, True)
     app = App(root, launch_data)
     root.mainloop()

@@ -1,9 +1,12 @@
 {
-    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/familia.db",
+    "software_name": "Fcode GUI",
+    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/test_db.db",
     "language_dir": "resources/lang/",
+    "available_languages_file": "resources/lang/filenames.json",
     "image_dir": "resources/img/",
     "color_file": "resources/style/colors.json",
     "font_file": "resources/style/fonts.json",
     "image_file": "resources/style/images.json",
-    "language": "ES"
+    "language": "Espa\u00f1ol",
+    "welcome_menu": "True"
 }

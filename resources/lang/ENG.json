@@ -9,6 +9,7 @@
     "tab_info": "Info",
     "save": "Save",
     "delete": "Delete",
+    "exit": "Exit",
     "spouse": "Spouse",
     "father": "Father",
     "mother": "Mother",
@@ -26,5 +27,11 @@
     "empty_fcode_error": "Field \"Fcode\" is empty. Please fill it out before saving the entry.",
     "del_confirmation": "This action will delete the current entry.",
     "sibling_number": "Sibling No.",
-    "offspring_number": "Offspring No."
+    "offspring_number": "Offspring No.",
+    "new_family_btn": "New family",
+    "import_family_btn": "Import family",
+    "sqlite_file": "SQLite File",
+    "fdata_file": "Fdata File",
+    "tsv_file": "TSV File",
+    "all_files": "All Files"
 }

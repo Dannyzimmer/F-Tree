@@ -1,3 +1,5 @@
 {
-    "database_icon": "db.png"
+    "database_icon": "db.png",
+    "lang_icon_dark": "lang_world_dark_mode.png",
+    "lang_icon_light": "lang_world_light_mode.png"
 }
