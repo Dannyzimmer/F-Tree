@@ -116,6 +116,7 @@ class WelcomeMenu(ctk.CTk):
                 filename = TSVNewNameDialog(old_filename, self.launch_data).get_input()
                 database = DatabaseTSV(file_path, self.launch_data.params, database_filename=filename)
                 FileSavedInDialog(self.launch_data.params.database, self.launch_data)
+                self.launch_data.recent_manager.add_file_to_recent_file(self.launch_data.params.database)
                 self.destroy()
                 import GUI
                 GUI.launch(self.launch_data, database)

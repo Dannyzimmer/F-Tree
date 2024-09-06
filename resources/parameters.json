@@ -1,6 +1,6 @@
 {
     "software_name": "Fcode GUI",
-    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/resources/database/database.db",
+    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/test_db.db",
     "default_database_dir": "resources/database",
     "recent_database_files": "resources/database/recent.json",
     "language_dir": "resources/lang/",
