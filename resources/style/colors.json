@@ -11,5 +11,6 @@
     "console_green": "#8EDA8D",
     "console_selection": "#5B93C8",
     "frame_background": "gray20",
-    "frame_foreground": "gray80"
+    "frame_foreground": "gray80",
+    "soft_red": "#a85d5d"
 }

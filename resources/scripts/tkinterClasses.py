@@ -1,6 +1,7 @@
 import customtkinter as tk
 from tkinter import ttk
 import re
+import pandas as pd
 
 class LabelWidget:
     def __init__(self, root, label_text, row, col, label_width=10, show_label=True, **kwargs):
@@ -100,6 +101,51 @@ class LabelButton(LabelWidget):
         # Widget
         self.button = tk.CTkButton(self.frame, text=button_text, command=command, **kwargs)
         self.button.grid(sticky='E', row=0, column=2, padx=5, pady=5)
+
+class Tableview(ttk.Treeview):
+    def __init__(self, parent, pandasDF: pd.DataFrame):
+        super().__init__(parent, show='headings')  # Oculta la columna #0
+        self.data = pandasDF
+        self.refresh()
+        self.get_selection()
+
+    def _add_data_rows(self):
+        for _, row in self.data.iterrows():
+            values = [row[col] for col in self["columns"]]
+            self.insert("", tk.END, values=values)
+
+    def _remove_all_rows(self):
+        for item in self.get_children():
+            self.delete(item)
+
+    def _add_columns(self):
+        self["columns"] = list(self.data.columns)
+        for col in self["columns"]:
+            col_width = max(self.data[col].astype(str).map(len).max(), len(col)) + 2
+            self.heading(col, text=col)
+            self.column(col, width=col_width * 8, stretch=True)
+
+    def refresh(self)-> None:
+        self._remove_all_rows()
+        self._add_columns()
+        self._add_data_rows()
+
+    def focus_first_row(self)-> None:
+        self.focus_set()
+        children = self.get_children()
+        if children:
+            self.focus(children[0])
+            self.selection_set(children[0])
+
+    def get_selection(self)-> dict:
+        selected_items = self.selection()
+        if not selected_items:
+            return {}
+
+        selected_item = selected_items[0]
+        values = self.item(selected_item, 'values')
+        columns = self["columns"]
+        return {columns[i]: values[i] for i in range(len(columns))}
 
 def get_column_values(treeview, column):
     """

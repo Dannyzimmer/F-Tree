@@ -30,6 +30,7 @@
     "sibling_number": "Nº Herman@",
     "offspring_number": "Nº Hij@",
     "new_family_btn": "Nueva familia",
+    "open_family_btn": "Abrir familia",
     "import_family_btn": "Importar familia",
     "sqlite_file": "Archivo SQLite",
     "fdata_file": "Archivo Fdata",
@@ -38,5 +39,6 @@
     "import_filename_msg": "Se creará un nuevo archivo \".db\" a partir de \"@1\". Por favor, introduce un nombre para el nuevo archivo.",
     "info": "Información",
     "file_saved_in_msg": "Base de datos guardada en:",
-    "ok": "OK"
+    "ok": "OK",
+    "recent_files": "Recientes"
 }

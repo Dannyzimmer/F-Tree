@@ -146,6 +146,57 @@ class ImageManager(GenericManager):
             size=(width, height)
             )
 
+class RecentDBManager(GenericManager):
+    def __init__(self, parameter_manager: ParameterManager):
+        self.params = parameter_manager
+        super().__init__(parameter_manager, self.params.recent_database_files)
+        self.recent_files = self.get_recent_files()
+        self.recent_paths = self.get_recent_paths()
+        self.file_dic = self.get_files_dic()
+
+    def get_recent_files(self)-> list:
+        result = []
+        data : dict = load_json(self.params.recent_database_files)
+        for k in list(data.keys()):
+            result.append(k)
+        return result
+
+    def get_recent_paths(self)-> list:
+        result = []
+        data : dict = load_json(self.params.recent_database_files)
+        for v in list(data.values()):
+            result.append(v)
+        return result
+    
+    def get_files_dic(self)-> dict:
+        result = {}
+        data : dict = load_json(self.params.recent_database_files)
+        for k, v in list(data.items()):
+            result[k] = v
+        return result
+    
+    def get_path_from_file(self, filename)-> str:
+        if filename != '...':
+            return self.file_dic[filename]
+        else:
+            return 'NA'
+    
+    def update_files_dic(self)-> None:
+        self.recent_files = [os.path.basename(i) for i in self.recent_paths]
+        for file, path in zip(self.recent_files, self.recent_paths):
+            self.file_dic[file] = path
+
+    def add_path_to_recent_paths(self, path)-> None:
+        self.recent_paths.insert(0, path)
+
+    def add_file_to_recent_file(self, filepath)-> None:
+        self.add_path_to_recent_paths(filepath)
+        if len(self.recent_paths) > int(self.params.num_recent_files):
+            self.recent_paths = self.recent_paths[0:int(self.params.num_recent_files)]
+        self.update_files_dic()
+        with open(self.params.recent_database_files, 'w') as f:
+            json.dump(self.file_dic, f, indent = 4)
+
 class LaunchData:
     def __init__(self, parameter_manager: ParameterManager):
         self.params = parameter_manager
@@ -153,6 +204,7 @@ class LaunchData:
         self.color_manager = ColorManager(self.params)
         self.font_manager = FontManager(self.params)
         self.image_manager = ImageManager(self.params)
+        self.recent_manager = RecentDBManager(self.params)
 
     def refresh(self):
         self.params.refresh()

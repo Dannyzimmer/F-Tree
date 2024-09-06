@@ -1,5 +1,7 @@
 import customtkinter as tk
 from resources.scripts.JsonManager import LaunchData
+from resources.scripts.tkinterClasses import Tableview
+import pandas as pd
 
 class NewNameDialog(tk.CTkInputDialog):
     def __init__(
@@ -43,3 +45,21 @@ class FileSavedInDialog(tk.CTk):
     def on_ok(self):
         self.destroy()
     
+class RecentDBTable(Tableview):
+    def __init__(self, parent, launch_data: LaunchData):
+        self.launch_data = launch_data
+        colname = self.launch_data.lang_manager.recent_files
+        self.data = pd.DataFrame(self.launch_data.recent_manager.recent_files, columns=[colname])
+        if len(self.data) == 0:
+            self.data = pd.DataFrame(['...'], columns=[colname])
+        super().__init__(parent, self.data)
+
+    def get_selection(self)-> dict:
+        selected_items = self.selection()
+        if not selected_items:
+            return ""
+        selected_item = selected_items[0]
+        values = self.item(selected_item, 'values')
+        columns = self["columns"]
+        dic = {columns[i]: values[i] for i in range(len(columns))}
+        return str(list(dic.values())[0])
