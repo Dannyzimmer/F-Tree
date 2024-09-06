@@ -104,7 +104,6 @@ class WelcomeMenu(ctk.CTk):
     def import_family_menu(self):
         file_path = filedialog.askopenfilename(parent=self, 
                         filetypes=[
-                            (self.launch_data.lang_manager.sqlite_file, "*.db"),
                             (self.launch_data.lang_manager.fdata_file, "*.fdata"),
                             (self.launch_data.lang_manager.tsv_file, "*.tsv"),
                             (self.launch_data.lang_manager.all_files, "*.*")
