@@ -5,19 +5,14 @@ from resources.scripts.Database import create_table_from_tsv, load_data_from_tsv
 from resources.scripts.Database import Database
 from resources.scripts.tkinterClasses import LabelEntry, LabelDropdown, LabelTextbox, LabelTable, get_column_values
 from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
-from resources.scripts.autocombobox import AutocompleteCombobox
+# from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
-from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager
+from resources.scripts.JsonManager import LaunchData
 from PIL import Image
 import os
-import json
-
-parameter_path = 'resources/parameters.json'
-params = ParameterManager(parameter_path)
-color = ColorManager(params) #FIXME: end the refactoring the code
 
 class App:
-    def __init__(self, root, launch_data):
+    def __init__(self, root, launch_data: LaunchData):
         self.root = root
         self.db_path = launch_data.params.database
         self.db_filename = os.path.basename(self.db_path)
@@ -95,7 +90,7 @@ class App:
 
         # Widgets Information Tab
         self.info_header_frame = tk.CTkFrame(self.tabview.tab(info_tab), fg_color='gray20')
-        self.info_self_label = tk.CTkLabel(self.info_header_frame, text="NA", font=self.font.name, text_color=color.blue_gray)
+        self.info_self_label = tk.CTkLabel(self.info_header_frame, text="NA", font=self.font.name, text_color=self.launch_data.color_manager.blue_gray)
         self.info_header_frame.grid(sticky='NEWS', row=0, column=0, padx = 5, pady = (10, 10))
         self.info_self_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=(10,0))
 
@@ -265,8 +260,8 @@ class App:
         column_values = get_column_values(self.table.tree, 1)
         self.search_frame = tk.CTkFrame(self.table.frame,
                                         fg_color=(
-                                            color.frame_foreground,
-                                            color.frame_background))
+                                            self.launch_data.color_manager.frame_foreground,
+                                            self.launch_data.color_manager.frame_background))
         self.search_frame.grid(sticky='E', row=0, column = 1, columnspan=3)
         
         # Search box

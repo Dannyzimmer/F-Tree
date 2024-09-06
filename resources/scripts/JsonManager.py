@@ -46,15 +46,33 @@ class GenericManager(JsonManager):
     def __init__(self, parameter_manager: object, json_to_load: str):
         self.params = parameter_manager
         super().__init__(json_to_load)
+
+    def refresh(self):
+        params_path = self.params._params_path
+        self._data = load_json(self._json_file)
+        self._add_attributes_from_dict(self._data)
+        self.params = ParameterManager(params_path)
+
+class ParameterManager(JsonManager):
+    '''Class for managing the parameter file of the GUI. Attributes are the keys
+    of the selected dictionary.'''
+    def __init__(self, parameters_file):
+        super().__init__(parameters_file)
+        self._params_path = parameters_file
     
+    def write_param(self, param_name, value):
+        self.set_field_to_value(param_name, value)
+        self.write_params_to_file()
+        self.refresh()
+
 class LangManager(GenericManager):
-    def __init__(self, parameter_manager: object):
+    def __init__(self, parameter_manager: ParameterManager):
         '''Class for managing the language of the GUI. Attributes are the
         keys of the selected dictionary.
         '''
         self.params = parameter_manager
-        json_to_load = self._get_language_filepath()
-        super().__init__(parameter_manager, json_to_load)
+        language_file = self._get_language_filepath()
+        super().__init__(parameter_manager, language_file)
 
     def _get_current_language(self):
         return self.params.language
@@ -73,15 +91,22 @@ class LangManager(GenericManager):
     def _get_language_filepath(self):
         lang_dir = self._get_language_dir()
         filename = self._get_current_language_filename()
-        return lang_dir + '/' + filename
+        return os.path.join(lang_dir, filename)
     
     def get_available_languages(self)-> list:
         return list(load_json(self.params.available_languages_file).keys())
+    
+    def refresh(self):
+        language_file = self._get_language_filepath()
+        params_path = self.params._params_path
+        self.params.refresh()
+        self.params = ParameterManager(params_path)
+        super().__init__(self.params, language_file)
 
 class ColorManager(GenericManager):
     '''Class for managing color of the GUI. Attributes are the keys of the
     selected dictionary.'''
-    def __init__(self, parameter_manager: object):
+    def __init__(self, parameter_manager: ParameterManager):
         self.params = parameter_manager
         json_to_load = self._get_color_file()
         super().__init__(parameter_manager, json_to_load)
@@ -92,7 +117,7 @@ class ColorManager(GenericManager):
 class FontManager(GenericManager):
     '''Class for managing fonts of the GUI. Attributes are the keys of the
     selected dictionary.'''
-    def __init__(self, parameter_manager: object):
+    def __init__(self, parameter_manager: ParameterManager):
         self.params = parameter_manager
         self.load_new_json(self.params.font_file)
 
@@ -103,7 +128,7 @@ class FontManager(GenericManager):
 class ImageManager(GenericManager):
     '''Class for managing images of the GUI. Attributes are the keys of the
     selected dictionary.'''
-    def __init__(self, parameter_manager: object):
+    def __init__(self, parameter_manager: ParameterManager):
         self.params = parameter_manager
         json_to_load = self._get_json_to_load()
         super().__init__(parameter_manager, json_to_load)
@@ -122,15 +147,20 @@ class ImageManager(GenericManager):
             size=(width, height)
             )
 
-class ParameterManager(JsonManager):
-    '''Class for managing the parameter file of the GUI. Attributes are the keys
-    of the selected dictionary.'''
-    def __init__(self, parameters_file):
-        super().__init__(parameters_file)
-        self.params_path = parameters_file
-    
-    def write_param(self, param_name, value):
-        self.set_field_to_value(param_name, value)
-        self.write_params_to_file()
-        self.refresh()
-        
+class LaunchData:
+    def __init__(self, parameter_manager: ParameterManager):
+        self.params = parameter_manager
+        self.lang_manager = LangManager(self.params)
+        self.color_manager = ColorManager(self.params)
+        self.font_manager = FontManager(self.params)
+        self.image_manager = ImageManager(self.params)
+
+    def refresh(self):
+        self.params.refresh()
+        self.lang_manager.refresh()
+        self.color_manager.refresh()
+        self.image_manager.refresh()
+
+# p = ParameterManager('/home/dannyzimm/Documentos/programacion/fcodes_gui/resources/parameters.json')
+# l = LangManager(p)
+# pass

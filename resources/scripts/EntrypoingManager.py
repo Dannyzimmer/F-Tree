@@ -1,5 +1,5 @@
 import os
-from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager, ImageManager
+from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager, ImageManager, LaunchData
 
 class EntrypoingManager:
     def __init__(self, parameter_manager: object):
@@ -18,11 +18,3 @@ class EntrypoingManager:
         
     def is_database_avail(self):
         return os.path.exists(self.params.database)
-
-class LaunchData:
-    def __init__(self, parameter_manager: object):
-        self.params = parameter_manager
-        self.lang_manager = LangManager(self.params)
-        self.color_manager = ColorManager(self.params)
-        self.font_manager = FontManager(self.params)
-        self.image_manager = ImageManager(self.params)

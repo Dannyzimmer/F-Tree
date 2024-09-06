@@ -1,13 +1,14 @@
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
+from resources.scripts.JsonManager import LaunchData
 
 # Initialize customtkinter
 ctk.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
 ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 class WelcomeMenu(ctk.CTk):
-    def __init__(self, launch_data):
+    def __init__(self, launch_data: LaunchData):
         super().__init__()
         self.launch_data = launch_data
         self.title("Database Menu")
@@ -41,7 +42,7 @@ class WelcomeMenu(ctk.CTk):
 
     def on_language_selection(self, selected_language):
         self.launch_data.params.write_param("language", selected_language)
-        print(self.launch_data.params.language)
+        self.refresh()
 
     def create_database(self):
         # Function to handle creating a new database
@@ -67,42 +68,11 @@ class WelcomeMenu(ctk.CTk):
             import GUI
             GUI.launch(self.launch_data)
     
-
-# class ImportMenu(ctk.CTkToplevel):
-#     def __init__(self, parent):
-#         super().__init__(parent)
-        
-#         self.title("Import Database")
-#         self.geometry("400x300")
-#         self.transient(parent)  # Ensure this window is always on top of the parent
-
-#         self.label = ctk.CTkLabel(self, text="Import Database from:", font=("Arial", 14))
-#         self.label.pack(pady=20)
-
-#         self.sqlite_button = ctk.CTkButton(self, text="SQLite File", command=self.import_sqlite)
-#         self.sqlite_button.pack(pady=10)
-
-#         self.tsv_button = ctk.CTkButton(self, text="TSV File", command=self.import_tsv)
-#         self.tsv_button.pack(pady=10)
-
-#         self.fdata_button = ctk.CTkButton(self, text="FData File", command=self.import_fdata)
-#         self.fdata_button.pack(pady=10)
-
-#     def import_sqlite(self):
-#         file_path = filedialog.askopenfilename(parent=self, filetypes=[("SQLite Files", "*.sqlite"), ("All Files", "*.*")])
-#         if file_path:
-#             messagebox.showinfo("Info", f"Importing SQLite database from {file_path}")
-
-#     def import_tsv(self):
-#         file_path = filedialog.askopenfilename(parent=self, filetypes=[("TSV Files", "*.tsv"), ("All Files", "*.*")])
-#         if file_path:
-#             messagebox.showinfo("Info", f"Importing TSV database from {file_path}")
-
-#     def import_fdata(self):
-#         file_path = filedialog.askopenfilename(parent=self, filetypes=[("FData Files", "*.fdata *.txt"), ("All Files", "*.*")])
-#         if file_path:
-#             messagebox.showinfo("Info", f"Importing FData database from {file_path}")
-
+    def refresh(self):
+        self.launch_data.lang_manager.refresh()
+        self.launch_data.refresh()
+        self.destroy()
+        self.__init__(self.launch_data)
 
 def launch(launch_data):
     app = WelcomeMenu(launch_data)
