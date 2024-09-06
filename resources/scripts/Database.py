@@ -1,6 +1,8 @@
 import sqlite3
+import os
 import csv
 from resources.libs.fcodes.fcodes.libs.classes.FBook import FBook
+from resources.scripts.JsonManager import ParameterManager
 
 def create_table_from_tsv(tsv_file, sqlite_file, sqlite_table):
     # Connect to SQLite database (create if it doesn't exist)
@@ -147,7 +149,39 @@ class Database:
         self.cur.close()
         self.con.close()
     
+class DatabaseTSV(Database):
+    def __init__(self, tsv_path: str, parameter_manager: ParameterManager,
+                 database_filename: str = ''):
+        self.tsv_path = tsv_path
+        self.database_filename = database_filename
+        self.params = parameter_manager
+        self.db_path = self.get_database_path()
+        self._build_database()
+        super().__init__(self.db_path)
 
+    def get_tsv_path(self):
+        return self.tsv_path
+    
+    def get_tsv_filename(self):
+        return os.path.basename(self.tsv_path)
+    
+    def get_database_filename(self):
+        if self.database_filename == '':
+            return os.path.splitext(self.get_tsv_filename())[0] + '.db'
+        else:
+            return os.path.splitext(self.database_filename)[0] + '.db'
+    
+    def get_database_path(self):
+        return os.path.join(self.params.default_database_dir, 
+                            self.get_database_filename())
+    
+    def _write_new_database_to_params(self):
+        self.params.write_param("database", self.get_database_path())
+    
+    def _build_database(self, sqlite_table = 'family'):
+        convert_tsv_to_sqlite(self.get_tsv_path(), self.get_database_path(),
+                              sqlite_table)
+        self._write_new_database_to_params()
 
 # db_path = '/Users/Daniel/Library/Mobile Documents/com~apple~CloudDocs/Documents/Programación/fcodes_gui/familia.db'
 # db_path = '/Users/Daniel/Library/Mobile Documents/com~apple~CloudDocs/Documents/Programación/fcodes_gui/test_db.db'

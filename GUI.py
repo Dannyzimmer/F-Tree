@@ -2,7 +2,7 @@
 import customtkinter as tk
 from tkinter import messagebox
 from resources.scripts.Database import create_table_from_tsv, load_data_from_tsv, convert_tsv_to_sqlite
-from resources.scripts.Database import Database
+from resources.scripts.Database import Database, DatabaseTSV
 from resources.scripts.tkinterClasses import LabelEntry, LabelDropdown, LabelTextbox, LabelTable, get_column_values
 from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
 # from resources.scripts.autocombobox import AutocompleteCombobox
@@ -12,7 +12,7 @@ from PIL import Image
 import os
 
 class App:
-    def __init__(self, root, launch_data: LaunchData):
+    def __init__(self, root, launch_data: LaunchData, database: Database | DatabaseTSV):
         self.root = root
         self.db_path = launch_data.params.database
         self.db_filename = os.path.basename(self.db_path)
@@ -20,7 +20,7 @@ class App:
         self.lang = launch_data.lang_manager
         self.font = launch_data.font_manager
         # self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.db = Database(self.db_path)
+        self.db = database #Database(self.db_path)
 
         # Style parameters
         self.biography_height = 500
@@ -390,11 +390,11 @@ class App:
     #     self.db.close()
     #     self.root.destroy()
 
-def launch(launch_data):
+def launch(launch_data, database):
     root = tk.CTk()
     root.title(launch_data.params.software_name)
     root.resizable(True, True)
-    app = App(root, launch_data)
+    app = App(root, launch_data, database)
     root.mainloop()
 
 if __name__ == "__main__":

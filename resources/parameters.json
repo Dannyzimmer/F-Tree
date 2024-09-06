@@ -1,6 +1,7 @@
 {
     "software_name": "Fcode GUI",
-    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/familia.db",
+    "database": "resources/database/borr.db",
+    "default_database_dir": "resources/database",
     "language_dir": "resources/lang/",
     "available_languages_file": "resources/lang/filenames.json",
     "image_dir": "resources/img/",

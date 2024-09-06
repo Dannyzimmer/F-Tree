@@ -8,6 +8,7 @@
     "tab_add": "Add",
     "tab_info": "Info",
     "save": "Save",
+    "save_as": "Save as",
     "delete": "Delete",
     "exit": "Exit",
     "spouse": "Spouse",
@@ -33,5 +34,9 @@
     "sqlite_file": "SQLite File",
     "fdata_file": "Fdata File",
     "tsv_file": "TSV File",
-    "all_files": "All Files"
+    "all_files": "All Files",
+    "import_filename_msg": "A new \".db\" file will be created from \"@1\". Please enter a name for the new file.",
+    "info": "Info",
+    "file_saved_in_msg": "Database saved on:",
+    "ok": "OK"
 }

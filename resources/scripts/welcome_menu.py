@@ -1,7 +1,10 @@
+import os
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
 from resources.scripts.JsonManager import LaunchData
+from resources.scripts.Database import Database, DatabaseTSV
+from resources.scripts.widgets import TSVNewNameDialog, FileSavedInDialog
 
 # Initialize customtkinter
 ctk.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
@@ -63,10 +66,31 @@ class WelcomeMenu(ctk.CTk):
                             (self.launch_data.lang_manager.all_files, "*.*")
                             ])
         if file_path:
-            self.launch_data.params.write_param("database", file_path)
-            self.destroy()
-            import GUI
-            GUI.launch(self.launch_data)
+            old_filename = os.path.basename(file_path)
+            # TSV
+            if os.path.splitext(file_path)[1] in ['.tsv', '.TSV']:
+                filename = TSVNewNameDialog(old_filename, self.launch_data).get_input()
+                database = DatabaseTSV(file_path, self.launch_data.params, database_filename=filename)
+                FileSavedInDialog(self.launch_data.params.database, self.launch_data)
+                self.destroy()
+                import GUI
+                GUI.launch(self.launch_data, database)
+            # DB (SQLite)
+            elif os.path.splitext(file_path)[1] in ['.db', '.DB']:
+                self.launch_data.params.write_param("database", file_path)
+                database = Database(file_path)
+                self.destroy()
+                import GUI
+                GUI.launch(self.launch_data, database)
+            # FDATA
+            elif os.path.splitext(file_path)[1] in ['.fdata', '.FDATA']:
+                print('Selected FDATA file.')
+            # Unknown
+            else:
+                print('Unknown file format.')
+        else:
+            pass
+
     
     def refresh(self):
         self.launch_data.lang_manager.refresh()

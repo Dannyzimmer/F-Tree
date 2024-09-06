@@ -1,5 +1,6 @@
 import os
-from resources.scripts.JsonManager import LangManager, ColorManager, FontManager, ParameterManager, ImageManager, LaunchData
+from resources.scripts.JsonManager import LaunchData
+from resources.scripts.Database import Database
 
 class EntrypoingManager:
     def __init__(self, parameter_manager: object):
@@ -13,8 +14,7 @@ class EntrypoingManager:
             
         else:
             import GUI
-            GUI.launch(self.launch_data)
-        
+            GUI.launch(self.launch_data, Database(self.params.database))
         
     def is_database_avail(self):
         return os.path.exists(self.params.database)

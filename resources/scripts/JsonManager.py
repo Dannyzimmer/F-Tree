@@ -3,7 +3,6 @@ import os
 from customtkinter import CTkImage
 from PIL import Image
 
-
 def load_json(json_file):
     with open(json_file) as f:
         return json.load(f)
