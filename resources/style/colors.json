@@ -12,5 +12,7 @@
     "console_selection": "#5B93C8",
     "frame_background": "gray20",
     "frame_foreground": "gray80",
-    "soft_red": "#a85d5d"
+    "soft_red": "#a85d5d",
+    "bright_red": "#ff8e8e",
+    "dark_red": "#b13737"
 }

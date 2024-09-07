@@ -3,8 +3,8 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
 from resources.scripts.JsonManager import LaunchData
-from resources.scripts.Database import Database, DatabaseTSV
-from resources.scripts.widgets import TSVNewNameDialog, FileSavedInDialog, RecentDBTable
+from resources.scripts.Database import Database, DatabaseTSV, DatabaseFDATA
+from resources.scripts.widgets import ImportNewNameDialog, FileSavedInDialog, RecentDBTable
 
 # Initialize customtkinter
 ctk.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
@@ -112,7 +112,7 @@ class WelcomeMenu(ctk.CTk):
             old_filename = os.path.basename(file_path)
             # TSV
             if os.path.splitext(file_path)[1] in ['.tsv', '.TSV']:
-                filename = TSVNewNameDialog(old_filename, self.launch_data).get_input()
+                filename = ImportNewNameDialog(old_filename, self.launch_data).get_input()
                 database = DatabaseTSV(file_path, self.launch_data.params, database_filename=filename)
                 FileSavedInDialog(self.launch_data.params.database, self.launch_data)
                 self.launch_data.recent_manager.add_file_to_recent_file(self.launch_data.params.database)
@@ -128,7 +128,13 @@ class WelcomeMenu(ctk.CTk):
                 GUI.launch(self.launch_data, database)
             # FDATA
             elif os.path.splitext(file_path)[1] in ['.fdata', '.FDATA']:
-                print('Selected FDATA file.')
+                filename = ImportNewNameDialog(old_filename, self.launch_data).get_input()
+                database = DatabaseFDATA(file_path, self.launch_data.params, database_filename=filename)
+                FileSavedInDialog(self.launch_data.params.database, self.launch_data)
+                self.launch_data.recent_manager.add_file_to_recent_file(self.launch_data.params.database)
+                self.destroy()
+                import GUI
+                GUI.launch(self.launch_data, database)
             # Unknown
             else:
                 print('Unknown file format.')
