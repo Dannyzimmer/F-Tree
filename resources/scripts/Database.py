@@ -183,10 +183,193 @@ class DatabaseTSV(Database):
                               sqlite_table)
         self._write_new_database_to_params()
 
-# db_path = '/Users/Daniel/Library/Mobile Documents/com~apple~CloudDocs/Documents/Programación/fcodes_gui/familia.db'
-# db_path = '/Users/Daniel/Library/Mobile Documents/com~apple~CloudDocs/Documents/Programación/fcodes_gui/test_db.db'
-# db = Database(db_path)
-# db.update_biography(fcode, biography)
-# db.close()
+class DatabaseFDATA(Database):
+    def __init__(self, fdata_path: str, parameter_manager: ParameterManager,
+                 database_filename: str = ''):
+        
+        def build_database_filename()-> str:
+            if database_filename == '':
+                return os.path.splitext(self.get_fdata_filename())[0] + '.db'
+            else:
+                return os.path.splitext(database_filename)[0] + '.db'
+            
+        def get_fdata()-> list:
+            return Fdata(self.fdata_path).get_clean_fdata()
+        
+        self.fdata_path = fdata_path
+        self.params = parameter_manager
+        self.fdata = get_fdata()
+        self.database_filename = build_database_filename()
+        self.database_path = self.get_database_path()
+        self._write_new_database_to_params()
+        self._build_database()
+        super().__init__(self.database_path)
 
-pass
+    def get_fdata_filename(self):
+        return os.path.basename(self.fdata_path)
+    
+    def get_database_filename(self):
+        return self.database_filename
+
+    def get_duplicates(self):
+        return Fdata(self.fdata_path).get_duplicates()
+    
+    def get_database_path(self):
+        return os.path.join(self.params.default_database_dir, 
+                            self.get_database_filename())
+    
+    def _write_new_database_to_params(self):
+        self.params.write_param("database", self.get_database_path())
+    
+    def _build_database(self, sqlite_table="family"):
+        conn = sqlite3.connect(self.database_path)
+        cursor = conn.cursor()
+
+        # Create the 'family' table
+        cursor.execute(f'''
+            CREATE TABLE IF NOT EXISTS {sqlite_table} (
+                fcode TEXT PRIMARY KEY,
+                name TEXT,
+                nickname TEXT,
+                biography TEXT,
+                yearBorn INTEGER,
+                notes TEXT
+            )
+        ''')
+
+        # Insert values from the list into the 'family' table
+        for entry in self.fdata:
+            fcode, name = entry
+            cursor.execute('''
+                INSERT OR IGNORE INTO family (fcode, name)
+                VALUES (?, ?)
+            ''', (fcode, name))
+
+        # Commit the transaction and close the connection
+        conn.commit()
+        conn.close()
+
+class Fdata:
+    def __init__(self, fdata_path): #FIXME: build methods out of __init__ constructor
+
+        def load_fdata(fdata_path) -> list: 
+            with open(fdata_path, mode='r') as f:
+                return f.readlines()
+        
+        def remove_linebreaks_and_extra_spaces(loaded_fdata: list) -> list:
+            return [i.strip() for i in loaded_fdata]
+        
+        def remove_empty_lines(loaded_fdata: list) -> list:
+            return [i for i in loaded_fdata if i not in ['\n', '']]
+        
+        def remove_comments(loaded_fdata: list) -> list:
+            return [i for i in loaded_fdata if i[0] != '#']
+        
+        def remove_full_duplicates(loaded_fdata: list) -> list:
+            return list(set(loaded_fdata))
+        
+        def address_duplicates(loaded_fdata: list) -> list: #FIXME: extract method
+            dup_man = DupManager(loaded_fdata)
+            self._duplicates = dup_man.get_duplicates()
+            return dup_man.get_deduplicated_fdata()
+        
+        def split_to_list_of_lists(loaded_fdata: list) -> list:
+            '''
+            [fcode name\tfcode name] -> [ [fcode, name], [fcode, name], ... ]
+            '''
+            return [i.split('\t') for i in loaded_fdata]
+
+        def get_clean_fdata(loaded_fdata: list) -> list:
+            input_fdata = load_fdata(loaded_fdata)
+            rm_linebreaks = remove_linebreaks_and_extra_spaces(input_fdata)
+            rm_empty_lines = remove_empty_lines(rm_linebreaks)
+            rm_comments = remove_comments(rm_empty_lines)
+            rm_full_dups = remove_full_duplicates(rm_comments)
+            split_list = split_to_list_of_lists(rm_full_dups)
+            return address_duplicates(split_list)
+        
+        self._fdata_path = fdata_path
+        self._fdata = get_clean_fdata(self._fdata_path)
+
+    def get_clean_fdata(self):
+        return self._fdata
+    
+    def get_duplicates(self): #FIXME: self._fdata has the deduplicated data, no duplicates are returned
+        return self._duplicates
+    
+class DupManager:
+    def __init__(self, fdata: list):
+        '''Manages duplicates in a list with the following format
+            [ [fcode, name], [fcode, name], ... ]
+        Where name can be: 
+            - name, last name
+            - name, first last name, second last name
+            - name, first last name, ?
+            - name, ?              , second last name
+            - ?   , first last name, second last name
+            - ?   , ?              , second last name
+            - ?   , first last name, ?
+            - name, ?              , ?
+            - ?
+        '''
+
+        def get_duplicate_list()-> list:
+            '''Return a list of the duplicated fcodes with the following format:
+                [ [fcode, name], [fcode, name], ... ]
+            '''
+            fcodes_duplicated = []
+            fcodes_in_result = []
+            for i in self._fdata:
+                if i[0] in fcodes_in_result:
+                    fcodes_duplicated.append(i[0])
+                fcodes_in_result.append(i[0])
+            return [i for i in self._fdata if i[0] in fcodes_duplicated]
+        
+        def get_fdata_without_duplicates()-> list:
+            '''Remove the duplicated sequences from the given fdata, return the
+            resulting list.'''
+            dups_fcodes = [i[0] for i in get_duplicate_list()]
+            return [i for i in self._fdata if i[0] not in dups_fcodes]
+
+        def get_duplicate_dic(duplicates_list: list)-> dict:
+            '''Return a dict with the following format:
+                {fcode_1: [name_1, name_2, name_3]}
+            '''
+            keys = set([i[0] for i in duplicates_list])
+            result = {k: [] for k in keys}
+            for k, v in duplicates_list:
+                result[k].append(v)
+            return result
+        
+        def stack_duplicated_names(duplicate_dic)-> dict:
+            '''Add the duplicated names under the same fcode'''
+            result = {k:[] for k in duplicate_dic.keys()}
+            for k, v in duplicate_dic.items():
+                value = []
+                for fullname in v:
+                    value.append(fullname)
+                    value.append('+')
+                value = value[0:-1]
+                value.insert(0, '(!)')
+                result[k] = ' '.join(value)
+            return result
+        
+        def convert_duplicated_dict_to_list(duplicated_dict: dict)-> list:
+            _ = stack_duplicated_names(self._duplicate_dic)
+            return [[k, ''.join(v)] for k, v in _.items()]
+
+        def get_deduplicated_result()-> list:
+            no_dups = get_fdata_without_duplicates()
+            dedups = convert_duplicated_dict_to_list(self._duplicate_dic)
+            return no_dups + dedups
+        
+        self._fdata = fdata
+        self._duplicate_dic : dict = get_duplicate_dic(get_duplicate_list())
+        self._deduplicated_fdata: list = get_deduplicated_result()
+        
+    def get_deduplicated_fdata(self)-> list:
+        return self._deduplicated_fdata
+    
+    def get_duplicates(self)-> dict:
+        return self._duplicate_dic 
+        
