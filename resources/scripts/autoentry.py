@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Authors: Mitja Martini and Russell Adams
 License: "Licensed same as original by Mitja Martini or public domain, whichever is less restrictive"
@@ -8,7 +9,10 @@ Edited by RedFantom for ttk and Python 2 and 3 cross-compatibility and <Enter> b
 import customtkinter as tk
 from tkinter import ttk
 
-tk_umlauts = ['odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresis', 'Udiaeresis', 'ssharp']
+tk_umlauts = [
+    'odiaeresis', 'adiaeresis', 'udiaeresis', 'Odiaeresis', 'Adiaeresis', 'Udiaeresis', 'ssharp',
+    'oacute', 'aacute', 'uacute', 'Oacute', 'Aacute', 'Uacute', 'ntilde'
+]
 
 
 class AutocompleteEntry(ttk.Entry):
@@ -84,29 +88,25 @@ class AutocompleteEntry(ttk.Entry):
 
         :param event: Tkinter event
         """
-        key = event.keysym
-        if key == "BackSpace":
+        if event.keysym == "BackSpace":
             self.delete(self.index(tk.INSERT), tk.END)
             self.position = self.index(tk.END)
-        elif key == "Left":
+        if event.keysym == "Left":
             if self.position < self.index(tk.END):  # delete the selection
                 self.delete(self.position, tk.END)
             else:
                 self.position -= 1  # delete one character
                 self.delete(self.position, tk.END)
-        elif key == "Right":
+        if event.keysym == "Right":
             self.position = self.index(tk.END)  # go to end (no selection)
-        elif key == "Down":
+        if event.keysym == "Down":
             self.autocomplete(1)  # cycle to next hit
-        elif key == "Up":
+        if event.keysym == "Up":
             self.autocomplete(-1)  # cycle to previous hit
-        elif key == "Return":
+        if event.keysym == "Return":
             self.handle_return(None)
             return
-        elif len(event.keysym) == 1 or key in tk_umlauts:
-            self.autocomplete()
-        elif event.char:  # Handle special characters
-            self.insert(tk.INSERT, event.char)
+        if len(event.keysym) == 1 or event.keysym in tk_umlauts:
             self.autocomplete()
 
     def handle_return(self, event):
