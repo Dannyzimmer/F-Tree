@@ -1,11 +1,12 @@
 from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
 from resources.libs.fcodes.fcodes.libs.external import graphviz
 from resources.libs.fcodes.fcodes.libs.classes.FBook import FBook
-from fcodes.fcodes import parameters as par
+from resources.libs.fcodes.fcodes import parameters as par
 from typing import List, Dict, Tuple
 from operator import attrgetter
 from resources.libs.fcodes.fcodes.libs.modules import tree_filters as tf
 from resources.libs.fcodes.fcodes.libs.data.keys import switch_sex_letter
+import os
 
 class FamilyTree():
     def __init__(self, data_path = par.DATA_PATH):
@@ -410,4 +411,6 @@ class FamilyTree():
                     format = 'pdf',
                     **kwargs: tf.Unpack[tf.Filters])-> None:
         TREE = self.get_tree(sort_by, **kwargs)
-        TREE.render(filepath, format = format)
+        path = os.path.dirname(filepath)
+        file = os.path.splitext(os.path.basename(filepath))[0]
+        TREE.render(filename=file, directory=path, cleanup=True, view=True)

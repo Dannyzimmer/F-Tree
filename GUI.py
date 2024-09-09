@@ -4,11 +4,14 @@ from tkinter import messagebox
 from resources.scripts.Database import create_table_from_tsv, load_data_from_tsv, convert_tsv_to_sqlite
 from resources.scripts.Database import Database, DatabaseTSV
 from resources.scripts.tkinterClasses import LabelEntry, LabelDropdown, LabelTextbox, LabelTable, get_column_values
+from resources.scripts.fcodesClasses import FamilyTreeTreeview
 from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
+from resources.scripts.html_report import HTMLReport
 # from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
 from resources.scripts.JsonManager import LaunchData
 from PIL import Image
+from tkinter import filedialog
 import os
 
 class App:
@@ -157,12 +160,30 @@ class App:
         self.db_export_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=5)
         self.db_export_menu.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
         self.db_export_button.grid(sticky='NWS', row=0, column=2, padx=10, pady=5)
+            # generate tree
+        self.generate_tree_frame = tk.CTkFrame(self.db_tab_frame)
+        self.generate_tree_frame.grid(sticky='NEWS', row=2, column=0, padx=10, pady=(20,10))
+        self.generate_tree_button = tk.CTkButton(self.generate_tree_frame, text=self.lang.generate_tree, command=self.on_generate_tree)
+        self.generate_tree_button.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
+            # generate report
+        self.generate_report_frame = tk.CTkFrame(self.db_tab_frame)
+        self.generate_report_frame.grid(sticky='NEWS', row=3, column=0, padx=10, pady=5)
+        self.generate_report_button = tk.CTkButton(self.generate_report_frame, text=self.lang.generate_report, command=self.on_generate_report)
+        self.generate_report_button.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
 
         # self.info_siblings_label.grid(sticky='W', row=3, column=0, padx = 10, pady = 5, columnspan = 2)
         # self.name_entry_infot = LabelEntry(self.tabview.tab(info_tab), self.lang.father, 0, 0)
         
         self.tabview.set(info_tab)
+
+    def on_generate_report(self):
+        output_report = filedialog.asksaveasfile(mode='w', filetypes=[('PDF', '*.pdf')]).name
+        HTMLReport(self.table.tree).save_report_to_pdf(output_report)
     
+    def on_generate_tree(self):
+        output_tree = filedialog.asksaveasfile(mode ='w', filetypes =[('PDF', '*.pdf')]).name
+        FamilyTreeTreeview(self.table.tree).render_tree(filepath = output_tree)
+
     def select_first_row(self):
         try:
             self.table.tree.selection_set(self.table.tree.get_children()[0])

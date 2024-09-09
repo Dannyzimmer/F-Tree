@@ -40,5 +40,7 @@
     "info": "Información",
     "file_saved_in_msg": "Base de datos guardada en:",
     "ok": "OK",
-    "recent_files": "Recientes"
+    "recent_files": "Recientes",
+    "generate_tree": "Generar árbol",
+    "generate_report": "Generar informe"
 }

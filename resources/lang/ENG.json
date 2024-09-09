@@ -40,5 +40,7 @@
     "info": "Info",
     "file_saved_in_msg": "Database saved on:",
     "ok": "OK",
-    "recent_files": "Recent files"
+    "recent_files": "Recent files",
+    "generate_tree": "Build tree",
+    "generate_report": "Create report"
 }

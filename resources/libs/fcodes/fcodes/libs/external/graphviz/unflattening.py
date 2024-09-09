@@ -2,7 +2,8 @@
 
 import typing
 
-from fcodes.libs.external import graphviz_render as graphviz #type: ignore
+# from fcodes.libs.external import graphviz_render as graphviz #type: ignore
+from resources.libs.fcodes.fcodes.libs.external import graphviz_render as graphviz #type: ignore
 from . import _tools
 from . import base
 from . import backend
