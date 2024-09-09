@@ -84,25 +84,29 @@ class AutocompleteEntry(ttk.Entry):
 
         :param event: Tkinter event
         """
-        if event.keysym == "BackSpace":
+        key = event.keysym
+        if key == "BackSpace":
             self.delete(self.index(tk.INSERT), tk.END)
             self.position = self.index(tk.END)
-        if event.keysym == "Left":
+        elif key == "Left":
             if self.position < self.index(tk.END):  # delete the selection
                 self.delete(self.position, tk.END)
             else:
                 self.position -= 1  # delete one character
                 self.delete(self.position, tk.END)
-        if event.keysym == "Right":
+        elif key == "Right":
             self.position = self.index(tk.END)  # go to end (no selection)
-        if event.keysym == "Down":
+        elif key == "Down":
             self.autocomplete(1)  # cycle to next hit
-        if event.keysym == "Up":
+        elif key == "Up":
             self.autocomplete(-1)  # cycle to previous hit
-        if event.keysym == "Return":
+        elif key == "Return":
             self.handle_return(None)
             return
-        if len(event.keysym) == 1 or event.keysym in tk_umlauts:
+        elif len(event.keysym) == 1 or key in tk_umlauts:
+            self.autocomplete()
+        elif event.char:  # Handle special characters
+            self.insert(tk.INSERT, event.char)
             self.autocomplete()
 
     def handle_return(self, event):

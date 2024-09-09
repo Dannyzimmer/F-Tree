@@ -72,7 +72,16 @@ class LabelTable(LabelWidget):
         self.clear()
         search = f'.*{pattern}.*'
         for row_data in self.data:
-            if re.search(pattern=search, string=row_data[column]) != None:
+            # Process the data to match the search type and avoid None values
+            if row_data[column] != None:
+                if type(row_data[column]) == int:
+                    text = str(row_data[column])
+                else:
+                    text = row_data[column]
+            else:
+                text = ''
+            # text = row_data[column] if row_data[column] != None else ''
+            if re.search(pattern=search, string=text) != None:
                 self.tree.insert('', tk.END, values=row_data)
     
     def select_first_item(self):

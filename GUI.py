@@ -164,15 +164,22 @@ class App:
         self.tabview.set(info_tab)
     
     def select_first_row(self):
-        self.table.tree.selection_set(self.table.tree.get_children()[0])
+        try:
+            self.table.tree.selection_set(self.table.tree.get_children()[0])
+        except IndexError:
+            print('No results')
 
     def refresh_selection(self, event=''):
         self.table_focus = self.table.tree.item(self.table.tree.selection())
-        self.selected_fcode = self.table_focus.get('values')[0]
-        self.selected_name = self.table_focus.get('values')[1]
-        self.selected_nickname = self.table_focus.get('values')[2]
-        self.selected_biography = self.table_focus.get('values')[3].strip()
-        self.selected_year = self.table_focus.get('values')[4]
+        try:
+            self.selected_fcode = self.table_focus.get('values')[0]
+            self.selected_name = self.table_focus.get('values')[1]
+            self.selected_nickname = self.table_focus.get('values')[2]
+            self.selected_biography = self.table_focus.get('values')[3].strip()
+            self.selected_year = self.table_focus.get('values')[4]
+        except IndexError:
+            # No results
+            pass
         self.name_entry.entry.delete(0, tk.END)
         self.nickname.entry.delete(0, tk.END)
         self.year.entry.delete(0, tk.END)
@@ -257,20 +264,34 @@ class App:
         self.table.tree.grid(columnspan=4)
 
         # Search frame
-        column_values = get_column_values(self.table.tree, 1)
         self.search_frame = tk.CTkFrame(self.table.frame,
                                         fg_color=(
                                             self.launch_data.color_manager.frame_foreground,
-                                            self.launch_data.color_manager.frame_background))
-        self.search_frame.grid(sticky='E', row=0, column = 1, columnspan=3)
+                                            self.launch_data.color_manager.frame_background)   
+                                        )
+        self.search_frame.grid(sticky='E', row=0, column = 1, columnspan=3, padx=10)
         
+        # Column selector
+        self._column_names_colnames_dict = {k:v for v, k in enumerate(self.table.tree.cget("columns"))}
+        self._column_names_index_dict = {k:v for k, v in enumerate(self.table.tree.cget("columns"))}
+        self.selected_column = 1
+        self.column_selector = tk.CTkComboBox(self.search_frame, values=list(self._column_names_colnames_dict.keys()), command = self.on_column_selection)
+        self.column_selector.grid(sticky='W', row=0, column=0, padx=10, pady=10)
+        self.column_selector.set(self._column_names_index_dict[self.selected_column])
+
         # Search box
-        self.search_autocom = AutocompleteEntry(self.search_frame, completevalues=column_values, width=30)
-        self.search_autocom.grid(sticky='E', row=0, column=0, columnspan=3)
+        self._column_values = [str(i) for i in get_column_values(self.table.tree, self.selected_column)]
+        self.search_autocom = AutocompleteEntry(self.search_frame, completevalues=self._column_values, width=30)
+        self.search_autocom.grid(sticky='E', row=0, column=1, columnspan=3)
         self.search_button = tk.CTkButton(self.search_frame, text=self.lang.search, width=12, command=self.go_search_button)
-        self.search_button.grid(sticky='E', row=0, column=4, padx = 10, pady = 5)
+        self.search_button.grid(sticky='E', row=0, column=5, padx = 10, pady = 5)
         # self.search_autocom.bind('<<ComboboxSelected>>', self.go_search_button)
         self.search_autocom.bind("<Return>", self.go_search_button)
+
+    def on_column_selection(self, event=None)-> None:
+        self.selected_column = self._column_names_colnames_dict[self.column_selector.get()]
+        self._column_values = [str(i) for i in get_column_values(self.table.tree, self.selected_column)]
+        self.search_autocom.set_completion_list(self._column_values)
 
     def select_tree_by_fcode(self, fcode):
         for item in self.table.tree.get_children():
@@ -339,7 +360,10 @@ class App:
 
     def go_search_button(self, _=''):
         pattern = self.search_autocom.get()
-        self.table.subset_table(pattern=pattern, column=1)
+        # Escapes the first asterisk (OC)
+        if self.selected_column == 0:
+            pattern = '\\' + pattern
+        self.table.subset_table(pattern=pattern, column=self.selected_column)
         self.select_first_row()
         self.refresh_selection()
     
