@@ -7,7 +7,7 @@ from resources.scripts.tkinterClasses import LabelEntry, LabelDropdown, LabelTex
 from resources.scripts.fcodesClasses import FamilyTreeTreeview
 from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
 from resources.scripts.html_report import HTMLReport
-# from resources.scripts.autocombobox import AutocompleteCombobox
+# from resources.scripts.widgets import CloseOnEditingWarning# from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
 from resources.scripts.Managers import LaunchData
 from PIL import Image
@@ -25,12 +25,14 @@ class App:
         # self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.db = database #Database(self.db_path)
 
+        self.editing_a_field = False
+
         # Style parameters
         self.biography_height = 500
         self.biography_width = 430
 
         # Tab view
-        self.tabview = tk.CTkTabview(self.root, width=485)
+        self.tabview = tk.CTkTabview(self.root, width=485, command=self.on_tab_change)
         self.tabview.grid(sticky='NEWS', row = 0, column = 1, padx = (0, 10), pady = 5)
         edit_tab = self.lang.tab_edit
         add_tab = self.lang.tab_add
@@ -99,13 +101,20 @@ class App:
         self.edt_nickname_entry.grid(row=1, column=1, **tab_elements_style)
         self.edt_year_entry.grid(row=2, column=1, **tab_elements_style)
 
-        self.biography = LabelTextbox(self.tabview.tab(edit_tab), self.lang.biography, 3, 0)
-        self.biography.textbox.configure(width = self.biography_width, height = self.biography_height)
+        self.edt_biography = LabelTextbox(self.tabview.tab(edit_tab), self.lang.biography, 3, 0)
+        self.edt_biography.textbox.configure(width = self.biography_width, height = self.biography_height)
         self.table_focus = self.table.tree.item(self.table.tree.selection())
         self.save_button = tk.CTkButton(self.edit_tab_button_frame, text=self.lang.save, command = self.save_entries_edit)
         self.del_button = tk.CTkButton(self.edit_tab_button_frame, text=self.lang.delete, command=self.delete_row_edit, fg_color='#D55B5B')
         self.save_button.grid(sticky = 'NE', row = 4, column = 0, padx = 10, pady = 10)
         self.del_button.grid(sticky = 'NE', row = 4, column = 1, padx = 10, pady = 10)
+
+        # Edition detection
+        self.edt_fcode_entry.bind('<Key>', command=self.on_edition)
+        self.edt_name_entry.bind('<Key>', command=self.on_edition)
+        self.edt_nickname_entry.bind('<Key>', command=self.on_edition)
+        self.edt_year_entry.bind('<Key>', command=self.on_edition)
+        self.edt_biography.textbox.bind('<Key>', command=self.on_edition)
 
         # Widgets Add Tab
         #-----------------------------------------------------------------------
@@ -140,10 +149,17 @@ class App:
         self.addt_year_label.grid(row=4, column=0, **tab_elements_style)
         self.addt_year_entry.grid(row=4, column=1, **tab_elements_style)
 
-        self.biography_addt = LabelTextbox(self.tabview.tab(add_tab), self.lang.biography, 5, 0)
-        self.biography_addt.textbox.configure(width = self.biography_width, height = self.biography_height)
+        self.addt_biography = LabelTextbox(self.tabview.tab(add_tab), self.lang.biography, 5, 0)
+        self.addt_biography.textbox.configure(width = self.biography_width, height = self.biography_height)
         self.save_button = tk.CTkButton(self.tabview.tab(add_tab), text=self.lang.save, command = self.save_entries_add)
         self.save_button.grid(sticky = 'NE', row = 6, column = 0, padx = 10, pady = 10)
+
+        # Edition detection
+        self.addt_fcode_entry.bind('<Key>', command=self.on_edition)
+        self.addt_name_entry.bind('<Key>', command=self.on_edition)
+        self.addt_nickname_entry.bind('<Key>', command=self.on_edition)
+        self.addt_year_entry.bind('<Key>', command=self.on_edition)
+        self.addt_biography.textbox.bind('<Key>', command=self.on_edition)
 
         # Widgets Information Tab
         #-----------------------------------------------------------------------
@@ -247,6 +263,16 @@ class App:
         
         self.tabview.set(info_tab)
 
+    def on_tab_change(self):
+        self.active_tab = self.tabview.get()
+        tabs = [self.launch_data.lang_manager.tab_edit, 
+             self.launch_data.lang_manager.tab_add]
+        if self.active_tab in tabs:
+            if self.active_tab == tabs[0]:
+                self.initial_fcode = self.edt_fcode_entry.get()
+            else:
+                self.initial_fcode = self.addt_fcode_entry.get()
+
     def on_generate_report(self):
         output_report = filedialog.asksaveasfile(mode='w', filetypes=[('PDF', '*.pdf')]).name
         HTMLReport(self.table.tree).save_report_to_pdf(output_report)
@@ -255,6 +281,9 @@ class App:
         output_tree = filedialog.asksaveasfile(mode ='w', filetypes =[('PDF', '*.pdf')]).name
         FamilyTreeTreeview(self.table.tree).render_tree(filepath = output_tree)
 
+    def on_edition(self, event=None):
+        self.set_editing_on()
+
     def select_first_row(self):
         try:
             self.table.tree.selection_set(self.table.tree.get_children()[0])
@@ -262,6 +291,9 @@ class App:
             print('No results')
 
     def refresh_selection(self, event=''):
+        if self.editing_a_field == True:
+            self.warning_no_save()
+
         self.table_focus = self.table.tree.item(self.table.tree.selection())
         try:
             self.selected_fcode = self.table_focus.get('values')[0]
@@ -276,7 +308,7 @@ class App:
         self.edt_name_entry.delete(0, tk.END)
         self.edt_nickname_entry.delete(0, tk.END)
         self.edt_year_entry.delete(0, tk.END)
-        self.biography.textbox.delete(1.0, tk.END)
+        self.edt_biography.textbox.delete(1.0, tk.END)
         # Refresh info tab
         self.info_self_label.configure(text=f'{self.selected_name}')
         self.info_fcode_label.configure(text=f'({self.selected_fcode})')
@@ -318,24 +350,38 @@ class App:
         if self.selected_year != "None":
             self.edt_year_entry.insert(0, self.selected_year)
         if self.selected_biography != "None":
-            self.biography.textbox.insert(1.0, self.selected_biography)
+            self.edt_biography.textbox.insert(1.0, self.selected_biography)
+
+    def set_editing_on(self):
+        self.editing_a_field = True
+
+    def set_editing_off(self):
+        self.editing_a_field = False
     
     def get_row_from_add_tab(self):
         """Return a row to insert in the SQLite DB from the data
         introduced in the add tab.
         """
-        fcode = self.addt_fcode_entry.entry.get()
-        name = self.addt_name_entry.entry.get()
-        nickname = self.addt_nickname_entry.entry.get()
-        biography = self.biography_addt.textbox.get(1.0, tk.END).strip()
-        year = self.addt_year_entry.entry.get()
+        fcode = self.addt_fcode_entry.get()
+        name = self.addt_name_entry.get()
+        nickname = self.addt_nickname_entry.get()
+        biography = self.addt_biography.textbox.get(1.0, tk.END).strip()
+        year = self.addt_year_entry.get()
         result = (fcode, name, nickname, biography, year, "")
         if result[0:3] == ("", "", "", ""):
             return ("", "", "", "", "")
         return result
 
     def load_table(self):
-        table_columns = ["Fcode", "Name", "Nickname", "Biography", "Year Born", "Notes"]
+        # table_columns_ori = ["Fcode", "Name", "Nickname", "Biography", "Year Born", "Notes"]
+        table_columns = [
+            self.launch_data.lang_manager.fcode,
+            self.launch_data.lang_manager.name,
+            self.launch_data.lang_manager.nickname,
+            self.launch_data.lang_manager.biography,
+            self.launch_data.lang_manager.year
+        ]
+
         table_data = self.db.table_shown
         table_name = f'   {self.db_filename}'
         icon = tk.CTkImage(
@@ -348,7 +394,10 @@ class App:
         self.table.tree.bind('<<TreeviewSelect>>', self.refresh_selection)
         # self.table.tree.selection_set(self.table.tree.get_children()[0])
         self.table.tree.configure(height=40)
-        self.table.tree.column("Name", width=250)
+        self.table.tree.column(self.launch_data.lang_manager.name, width=250)
+        self.table.tree.column(self.launch_data.lang_manager.nickname, width=150)
+        self.table.tree.column(self.launch_data.lang_manager.year, width=120)
+        self.table.tree["displaycolumns"] = table_columns[0:3] + [table_columns[-1]]
         self.refresh = False
         self.table.tree.grid(columnspan=4)
 
@@ -400,12 +449,12 @@ class App:
         self.select_tree_by_fcode(self.selected_fcode)
 
     def save_entries_edit(self):
-        new_fcode = self.edt_fcode_entry._entry.get()
-        new_biography = self.biography.textbox.get('1.0', 'end')
-        new_name = self.edt_name_entry.entry.get()
-        new_year = self.edt_year_entry.entry.get()
-        new_nickname = self.edt_nickname_entry.entry.get()
-        self.db.update_fcode(new_fcode)
+        new_fcode = self.edt_fcode_entry.get()
+        new_biography = self.edt_biography.textbox.get('1.0', 'end')
+        new_name = self.edt_name_entry.get()
+        new_year = self.edt_year_entry.get()
+        new_nickname = self.edt_nickname_entry.get()
+        self.db.update_fcode(self.initial_fcode, new_fcode)
         self.db.update_biography(self.selected_fcode, new_biography)
         self.db.update_name(self.selected_fcode, new_name)
         self.db.update_year_born(self.selected_fcode, new_year)
@@ -413,13 +462,14 @@ class App:
         # for i in self.table.tree.get_children():
         #     self.table.tree.delete(i)
         self.refresh_table()
+        self.set_editing_off()
 
     def clear_widgets_add(self):
-        self.addt_fcode_entry.entry.delete(0, tk.END)
-        self.addt_name_entry.entry.delete(0, tk.END)
-        self.addt_nickname_entry.entry.delete(0, tk.END)
-        self.biography_addt.textbox.delete(1.0, tk.END)
-        self.addt_year_entry.entry.delete(0, tk.END)
+        self.addt_fcode_entry.delete(0, tk.END)
+        self.addt_name_entry.delete(0, tk.END)
+        self.addt_nickname_entry.delete(0, tk.END)
+        self.addt_biography.textbox.delete(1.0, tk.END)
+        self.addt_year_entry.delete(0, tk.END)
     
     def save_entries_add(self):
         print('save_entries_add')
@@ -431,10 +481,12 @@ class App:
                 self.selected_fcode = row[0]
                 self.db.insert_row(row)
                 self.refresh_table()
-        self.clear_widgets_add()
+                self.clear_widgets_add()
+                self.set_editing_off()
     
     def delete_row_edit(self):
-        answer = messagebox.askokcancel(message=self.lang.del_confirmation)
+        message = f'{self.lang.del_confirmation} ({self.selected_fcode}).'
+        answer = messagebox.askokcancel(message=message)
         if answer:
             self.db.delete_row(self.selected_fcode)
             self.refresh_table()
@@ -498,6 +550,18 @@ class App:
                 print(f'Database exported to {tsv_file}')
         else:
             print('No valid export option selected')
+
+    def warning_no_save(self):
+        message = self.launch_data.lang_manager.warning_no_save
+        do_i_save = messagebox.askyesnocancel(title=None, message=message)
+        if do_i_save == True:
+            if self.active_tab == self.launch_data.lang_manager.tab_edit:
+                self.save_entries_edit()
+            elif self.active_tab == self.launch_data.lang_manager.tab_add:
+                self.save_entries_add()
+        if do_i_save == False:
+            self.set_editing_off()
+
         
 
     # def on_closing(self):
@@ -508,10 +572,11 @@ class App:
 def launch(launch_data, database):
     root = tk.CTk()
     root.title(launch_data.params.software_name)
-    current_width = 1320
-    current_height = 900
+    current_width = 1192
+    current_height = 902
     root.geometry(f"{current_width}x{current_height}")
     root.resizable(False, False)
+    # CloseOnEditingWarning()
     app = App(root, launch_data, database)
     root.mainloop()
 

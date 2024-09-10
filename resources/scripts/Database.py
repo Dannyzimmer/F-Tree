@@ -63,7 +63,7 @@ class Database:
         self.db_path = db_path
         self.con = sqlite3.connect(self.db_path)
         self.cur = self.con.cursor()
-        self.col_filter = '*'
+        self.col_filter = 'fcode, name, nickname, biography, yearBorn'
         self.table_shown = self.get_table_shown()
         self.current_row = ()
         self.n_fields = self.get_column_count()

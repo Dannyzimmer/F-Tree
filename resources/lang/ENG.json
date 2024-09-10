@@ -1,8 +1,10 @@
 {
     "name": "Name",
+    "fcode": "Fcode",
     "nickname": "Nickname",
     "year": "Year of Birth",
     "biography": "Biography",
+    "notes": "Notes",
     "table": "Data",
     "tab_edit": "Edit",
     "tab_add": "Add",
@@ -42,5 +44,6 @@
     "ok": "OK",
     "recent_files": "Recent files",
     "generate_tree": "Build tree",
-    "generate_report": "Create report"
+    "generate_report": "Create report",
+    "warning_no_save": "You have unsaved changes. Do you want to save them?"
 }

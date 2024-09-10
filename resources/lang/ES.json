@@ -1,9 +1,11 @@
 {
     "name": "Nombre",
+    "fcode": "Fcode",
     "nickname": "Apodo",
     "year": "Año nacimiento",
     "biography": "Biografía",
     "table": "Datos",
+    "notes": "Notas",
     "tab_edit": "Editar",
     "tab_add": "Añadir",
     "tab_info": "Información",
@@ -26,7 +28,7 @@
     "to_sqlite": "A Sqlite DB",
     "search": "Buscar",
     "empty_fcode_error": "Campo \"Fcode\" vacío. Por favor, cúbrelo antes de guardar la entrada.",
-    "del_confirmation": "Esta acción eliminará la entrada actual.",
+    "del_confirmation": "Esta acción eliminará la entrada actual:",
     "sibling_number": "Nº Herman@",
     "offspring_number": "Nº Hij@",
     "new_family_btn": "Nueva familia",
@@ -42,5 +44,6 @@
     "ok": "OK",
     "recent_files": "Recientes",
     "generate_tree": "Generar árbol",
-    "generate_report": "Generar informe"
+    "generate_report": "Generar informe",
+    "warning_no_save": "Tienes campos editados sin guardar, ¿quieres guardarlos?"
 }

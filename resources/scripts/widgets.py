@@ -150,3 +150,7 @@ class RecentDBTable(Tableview):
         columns = self["columns"]
         dic = {columns[i]: values[i] for i in range(len(columns))}
         return str(list(dic.values())[0])
+    
+# class CloseOnEditingWarning(ttk.messagebox.showwarning):
+#     def __init__(self):
+#         super().__init__()
