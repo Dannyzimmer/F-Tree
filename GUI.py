@@ -296,7 +296,7 @@ class App:
         self._column_names_colnames_dict = {k:v for v, k in enumerate(self.table.tree.cget("columns"))}
         self._column_names_index_dict = {k:v for k, v in enumerate(self.table.tree.cget("columns"))}
         self.selected_column = 1
-        self.column_selector = tk.CTkComboBox(self.search_frame, values=list(self._column_names_colnames_dict.keys()), command = self.on_column_selection)
+        self.column_selector = tk.CTkComboBox(self.search_frame, values=list(self._column_names_colnames_dict.keys()), command = self.on_column_selection, state='readonly')
         self.column_selector.grid(sticky='W', row=0, column=0, padx=10, pady=10)
         self.column_selector.set(self._column_names_index_dict[self.selected_column])
 
