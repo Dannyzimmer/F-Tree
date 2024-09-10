@@ -1,5 +1,5 @@
 import os
-from resources.scripts.JsonManager import LaunchData
+from resources.scripts.Managers import LaunchData
 from resources.scripts.Database import Database
 
 class EntrypoingManager:
@@ -18,3 +18,11 @@ class EntrypoingManager:
         
     def is_database_avail(self):
         return os.path.exists(self.params.database)
+
+class DebugEntrypointManager:
+    def __init__(self, parameter_manager: object):
+        self.params = parameter_manager
+        self.launch_data = LaunchData(self.params)
+    
+        import GUI
+        GUI.launch(self.launch_data, Database(self.params.database))

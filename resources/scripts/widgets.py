@@ -1,6 +1,6 @@
 import customtkinter as tk
 import tkinter as ttk
-from resources.scripts.JsonManager import LaunchData
+from resources.scripts.Managers import LaunchData
 from resources.scripts.tkinterClasses import Tableview
 import pandas as pd
 import os

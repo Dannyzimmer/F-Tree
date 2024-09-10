@@ -2,7 +2,7 @@ import os
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
-from resources.scripts.JsonManager import LaunchData
+from resources.scripts.Managers import LaunchData
 from resources.scripts.Database import Database, DatabaseTSV, DatabaseFDATA
 from resources.scripts.widgets import ImportNewNameDialog, FileSavedInDialog, RecentDBTable
 

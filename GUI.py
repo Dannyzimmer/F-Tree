@@ -9,7 +9,7 @@ from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
 from resources.scripts.html_report import HTMLReport
 # from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
-from resources.scripts.JsonManager import LaunchData
+from resources.scripts.Managers import LaunchData
 from PIL import Image
 from tkinter import filedialog
 import os
@@ -27,11 +27,11 @@ class App:
 
         # Style parameters
         self.biography_height = 500
-        self.biography_width = 500
+        self.biography_width = 430
 
         # Tab view
-        self.tabview = tk.CTkTabview(self.root, width=600)
-        self.tabview.grid(sticky='NEWS', row = 0, column = 1, padx = (2, 10), pady = 5)
+        self.tabview = tk.CTkTabview(self.root, width=485)
+        self.tabview.grid(sticky='NEWS', row = 0, column = 1, padx = (0, 10), pady = 5)
         edit_tab = self.lang.tab_edit
         add_tab = self.lang.tab_add
         info_tab = self.lang.tab_info
@@ -45,8 +45,6 @@ class App:
         self.left_frame = tk.CTkFrame(self.root)
         self.tabview.tab(edit_tab).grid(sticky='NEWS', row = 0, column = 1, padx = (2, 10), pady = 5)
         self.left_frame.grid(sticky='NEWS', row=0, column=0, padx = 10, pady = 5)
-        self.edit_tab_button_frame = tk.CTkFrame(self.tabview.tab(edit_tab))
-        self.edit_tab_button_frame.grid(sticky = 'NE', row = 4, column = 0, padx = 10, pady = 10)
         
         self.table = None
         self.refresh = True
@@ -56,7 +54,9 @@ class App:
             if self.select_first_row_bool:
                 self.select_first_row()
                 self.select_first_row_bool = False
-
+        
+        # Edit tab
+        #-----------------------------------------------------------------------
         # Selections (Edit tab)
         self.selected_fcode = None
         self.selected_name = None
@@ -65,10 +65,40 @@ class App:
         self.selected_year = None
 
         # Widgets Edit Tab
-        self.name_entry = LabelEntry(self.tabview.tab(edit_tab), self.lang.name, 0, 0)
-        self.name_entry.entry.configure(width = 250, placeholder_text = self.lang.name)
-        self.nickname = LabelEntry(self.tabview.tab(edit_tab), self.lang.nickname, 1, 0)
-        self.year = LabelEntry(self.tabview.tab(edit_tab), self.lang.year, 2, 0)
+        tab_elements_style = {"sticky":'NWS', "padx":(15, 10), "pady": 5}
+        edt_fcode_frame_elements_style = {"sticky": "NES", "padx":10, "pady": 5}
+
+        self.edit_tab_button_frame = tk.CTkFrame(self.tabview.tab(edit_tab))
+        self.edit_tab_button_frame.grid(sticky = 'NE', row = 4, column = 0, padx = 10, pady = 10)
+
+        self.edt_fcode_frame = tk.CTkFrame(self.tabview.tab(edit_tab), fg_color=('#b0b0b0', '#3b3b3b'))
+        self.edt_fcode_frame.grid(sticky='NEWS', row=0, column=0, columnspan=2, padx=10, pady=10)
+        self.edt_fcode_frame.grid_columnconfigure(0, weight=2)
+
+        self.edt_title_label = tk.CTkLabel(self.edt_fcode_frame, text=self.launch_data.lang_manager.tab_edit.upper(), **self.launch_data.widget_style_manager.edit_tab['section_title'])
+        self.edt_fcode_label = tk.CTkLabel(self.edt_fcode_frame, text = 'Fcode')
+        self.edt_fcode_entry = tk.CTkEntry(self.edt_fcode_frame)
+        self.edt_title_label.grid(sticky='NWS', row=0, column=0, padx=(15, 10), pady=5)
+        self.edt_fcode_label.grid(row=0, column=1, **edt_fcode_frame_elements_style)
+        self.edt_fcode_entry.grid(row=0, column=2, **edt_fcode_frame_elements_style)
+
+        self.edt_middle_frame = tk.CTkFrame(self.tabview.tab(edit_tab))
+        self.edt_middle_frame.grid(sticky='NEWS', row=1, column=0, columnspan=2, padx=10, pady=10)
+
+        self.edt_name_label = tk.CTkLabel(self.edt_middle_frame, text = self.lang.name)
+        self.edt_nickname_label = tk.CTkLabel(self.edt_middle_frame, text = self.lang.nickname)
+        self.edt_year_label = tk.CTkLabel(self.edt_middle_frame, text = self.lang.year)
+        self.edt_name_label.grid(row=0, column=0, **tab_elements_style)
+        self.edt_nickname_label.grid(row=1, column=0, **tab_elements_style)
+        self.edt_year_label.grid(row=2, column=0, **tab_elements_style)
+
+        self.edt_name_entry = tk.CTkEntry(self.edt_middle_frame, width=300)
+        self.edt_nickname_entry = tk.CTkEntry(self.edt_middle_frame, width=300)
+        self.edt_year_entry = tk.CTkEntry(self.edt_middle_frame)
+        self.edt_name_entry.grid(row=0, column=1, **tab_elements_style)
+        self.edt_nickname_entry.grid(row=1, column=1, **tab_elements_style)
+        self.edt_year_entry.grid(row=2, column=1, **tab_elements_style)
+
         self.biography = LabelTextbox(self.tabview.tab(edit_tab), self.lang.biography, 3, 0)
         self.biography.textbox.configure(width = self.biography_width, height = self.biography_height)
         self.table_focus = self.table.tree.item(self.table.tree.selection())
@@ -78,49 +108,88 @@ class App:
         self.del_button.grid(sticky = 'NE', row = 4, column = 1, padx = 10, pady = 10)
 
         # Widgets Add Tab
-        self.name_fcode_addt_frame = tk.CTkFrame(self.tabview.tab(add_tab))
-        self.name_fcode_addt_frame.grid_columnconfigure(0, weight=2)
-        self.name_fcode_addt_frame.grid(sticky='NEWS', row=0, column=0, columnspan=2)
-        self.name_entry_addt = LabelEntry(self.name_fcode_addt_frame, self.lang.name, 0, 0)
-        self.name_entry_addt.entry.configure(width = 200)
-        self.fcode_entry_addt = LabelEntry(self.name_fcode_addt_frame, "Fcode", 0, 1)
-        self.nickname_addt = LabelEntry(self.tabview.tab(add_tab), self.lang.nickname, 2, 0)
-        self.year_addt = LabelEntry(self.tabview.tab(add_tab), self.lang.year, 3, 0)
-        self.biography_addt = LabelTextbox(self.tabview.tab(add_tab), self.lang.biography, 4, 0)
-        self.biography_addt.textbox.configure(width = self.biography_width, height = self.biography_height - 30)
+        #-----------------------------------------------------------------------
+        addt_fcode_frame_elements_style = {"padx":10, "pady": 5}
+
+        self.addt_fcode_frame = tk.CTkFrame(self.tabview.tab(add_tab), fg_color=('#b0b0b0', '#3b3b3b'))
+        self.addt_fcode_frame.grid_columnconfigure(0, weight=2)
+        self.addt_fcode_frame.grid(sticky='NEWS', row=0, column=0, columnspan=2, padx=10, pady=10)
+
+        self.addt_title_label = tk.CTkLabel(self.addt_fcode_frame, text=self.launch_data.lang_manager.tab_add.upper(), **self.launch_data.widget_style_manager.add_tab['section_title'])
+        self.addt_fcode_label = tk.CTkLabel(self.addt_fcode_frame, text = 'Fcode')
+        self.addt_fcode_entry = tk.CTkEntry(self.addt_fcode_frame)
+        self.addt_title_label.grid(sticky='NWS', row=0, column=0, padx=(15, 10), pady=5)
+        self.addt_fcode_label.grid(sticky='NES', row=0, column=0, **addt_fcode_frame_elements_style)
+        self.addt_fcode_entry.grid(sticky='NWS',row=0, column=1, **addt_fcode_frame_elements_style)
+
+        self.addt_middle_frame = tk.CTkFrame(self.tabview.tab(add_tab))
+        self.addt_middle_frame.grid(sticky='NEWS', row=1, column=0, columnspan=2, padx=10, pady=10)
+
+        self.addt_name_label = tk.CTkLabel(self.addt_middle_frame, text=self.lang.name)
+        self.addt_name_entry = tk.CTkEntry(self.addt_middle_frame, width = 300)
+        self.addt_name_label.grid(row = 1, column = 0, **tab_elements_style)
+        self.addt_name_entry.grid(row = 1, column = 1, **tab_elements_style)
+
+        self.addt_nickname_label = tk.CTkLabel(self.addt_middle_frame, text = self.lang.nickname)
+        self.addt_nickname_entry = tk.CTkEntry(self.addt_middle_frame, width=300)
+        self.addt_nickname_label.grid(row = 3, column = 0, **tab_elements_style)
+        self.addt_nickname_entry.grid(row = 3, column = 1, **tab_elements_style)
+        
+        self.addt_year_label = tk.CTkLabel(self.addt_middle_frame, text = self.lang.year)
+        self.addt_year_entry = tk.CTkEntry(self.addt_middle_frame)
+        self.addt_year_label.grid(row=4, column=0, **tab_elements_style)
+        self.addt_year_entry.grid(row=4, column=1, **tab_elements_style)
+
+        self.biography_addt = LabelTextbox(self.tabview.tab(add_tab), self.lang.biography, 5, 0)
+        self.biography_addt.textbox.configure(width = self.biography_width, height = self.biography_height)
         self.save_button = tk.CTkButton(self.tabview.tab(add_tab), text=self.lang.save, command = self.save_entries_add)
-        self.save_button.grid(sticky = 'NE', row = 5, column = 0, padx = 10, pady = 10)
+        self.save_button.grid(sticky = 'NE', row = 6, column = 0, padx = 10, pady = 10)
 
         # Widgets Information Tab
-        self.info_header_frame = tk.CTkFrame(self.tabview.tab(info_tab), fg_color='gray20')
-        self.info_self_label = tk.CTkLabel(self.info_header_frame, text="NA", font=self.font.name, text_color=self.launch_data.color_manager.blue_gray)
-        self.info_header_frame.grid(sticky='NEWS', row=0, column=0, padx = 5, pady = (10, 10))
+        #-----------------------------------------------------------------------
+        info_style_data_grid = self.launch_data.widget_style_manager.info_data['data_labels_grid']
+        info_style_data_style = self.launch_data.widget_style_manager.info_data['data_labels_style']
+        info_style_section = self.launch_data.widget_style_manager.info_data['section_labels_style']
+        info_style_section_frames = self.launch_data.widget_style_manager.info_data['main_frame_grid']
+        info_style_header_frame = self.launch_data.widget_style_manager.info_data['header_frame']
+        info_style_header_title_style = self.launch_data.widget_style_manager.info_data['main_frame_title_style']
+        
+        # Main frame
+        self.info_main_frame = tk.CTkFrame(self.tabview.tab(info_tab))
+        self.info_main_frame.grid(**info_style_section_frames)
+        
+        # Header
+        self.info_header_frame = tk.CTkFrame(self.info_main_frame, **info_style_header_frame)
+        self.info_self_label = tk.CTkLabel(self.info_header_frame, **info_style_header_title_style)
+        self.info_header_frame.grid(sticky='NEWS', row=0, column=0, padx = 5, pady = (10, 10), columnspan=3)
         self.info_self_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=(10,0))
 
-        self.year_fcode_frame = tk.CTkFrame(self.info_header_frame, fg_color='gray20')
-        self.info_fcode_label = tk.CTkLabel(self.year_fcode_frame, text="", font=self.font.fcode, text_color='gray60')
-        self.info_year_label = tk.CTkLabel(self.year_fcode_frame, text="NA", font=self.font.year, text_color='gray80')
+        self.year_fcode_frame = tk.CTkFrame(self.info_header_frame, fg_color='transparent')
+        self.info_fcode_label = tk.CTkLabel(self.year_fcode_frame, text="", font=self.font.fcode, text_color=('#7a7a7a', 'gray60'))
+        self.info_year_label = tk.CTkLabel(self.year_fcode_frame, text="NA", font=self.font.year, text_color=('#575757', 'gray80'))
         self.year_fcode_frame.grid(sticky='NEWS', row=1, column=0, padx = 10, pady = (0, 10))
         self.info_year_label.grid(sticky='NWS', row=0, column=0, padx=(0,10), pady=1)
         self.info_fcode_label.grid(sticky='NSE', row=0, column=1, padx=10, pady=1)
 
-        self.info_spouse_label = tk.CTkLabel(self.tabview.tab(info_tab), text = self.lang.spouse.capitalize())
-        self.info_spouse_entry = tk.CTkEntry(self.tabview.tab(info_tab))
+        # Spouse
+        self.info_spouse_label = tk.CTkLabel(self.info_main_frame, text = self.lang.spouse.capitalize(), **info_style_section)
+        self.info_spouse_data_label = tk.CTkLabel(self.info_main_frame, **info_style_data_style)
         self.info_spouse_label.grid(sticky='NWS', row=2, column=0, padx=10, pady=(0,5))
-        self.info_spouse_entry.grid(sticky='NWS', row=3, column=0, padx=15, pady=(0,5))        
+        self.info_spouse_data_label.grid(row=3, **info_style_data_grid)        
 
-        self.info_parents_label = tk.CTkLabel(self.tabview.tab(info_tab), text = self.lang.parents.capitalize())
-        self.info_mother_entry = LabelEntry(self.tabview.tab(info_tab), "", 6, 0, show_label=False)
-        self.info_father_entry = LabelEntry(self.tabview.tab(info_tab), "", 7, 0, show_label=False)
+        # Parents
+        self.info_mother_data_label = tk.CTkLabel(self.info_main_frame, **info_style_data_style)
+        self.info_father_data_label = tk.CTkLabel(self.info_main_frame, **info_style_data_style)
+        self.info_mother_data_label.grid(row=5, **info_style_data_grid)
+        self.info_father_data_label.grid(row=6, **info_style_data_grid)
+        
+        self.info_parents_label = tk.CTkLabel(self.info_main_frame, text = self.lang.parents.capitalize(), **info_style_section)
         self.info_parents_label.grid(sticky='W', row=4, column=0, padx = 10, pady = (12,0), columnspan = 2)
-        self.info_mother_entry.entry.configure(placeholder_text=self.lang.mother, width = 250)
-        self.info_father_entry.entry.configure(placeholder_text=self.lang.father, width = 250)
-        self.info_father_entry.frame.grid(pady=0)
-        self.info_spouse_entry.configure(placeholder_text=self.lang.spouse, width = 250)
 
+        # Siblings
         columns = [self.lang.name, self.lang.sibling_number]
         siblings = ()
-        self.info_siblings_tree = LabelTable(self.tabview.tab(info_tab), self.lang.siblings, 8, 0, columns=columns, data=siblings, show_label = True)
+        self.info_siblings_tree = LabelTable(self.info_main_frame, self.lang.siblings, 8, 0, columns=columns, data=siblings, show_label = True, **info_style_section)
         self.info_siblings_tree.label.grid(sticky='W')
         self.info_siblings_tree.tree.column(self.lang.name, width=250)
         self.info_siblings_tree.tree.configure(height=8)
@@ -128,10 +197,11 @@ class App:
         self.info_siblings_tree.tree.grid(padx=15)
         self.info_siblings_tree.label.grid(pady=(12,0))
 
+        # Offspring
         columns_off = [self.lang.name, self.lang.offspring_number]
         siblings_off = ()
-        self.info_offspring_tree = LabelTable(self.tabview.tab(info_tab), self.lang.offspring, 9, 0, 
-            columns=columns_off, data=siblings_off, show_label = True)
+        self.info_offspring_tree = LabelTable(self.info_main_frame, self.lang.offspring, 9, 0, 
+            columns=columns_off, data=siblings_off, show_label = True, **info_style_section)
         self.info_offspring_tree.label.grid(sticky='W')
         self.info_offspring_tree.tree.column(self.lang.name, width=250)
         self.info_offspring_tree.tree.configure(height=8)
@@ -140,6 +210,7 @@ class App:
         self.info_offspring_tree.label.grid(pady=(10,0))
 
         # Database tab
+        #-----------------------------------------------------------------------
         self.db_tab_frame = tk.CTkFrame(self.tabview.tab(db_tab))
         self.db_tab_frame.grid(sticky='NEWS', row=0, column=0, padx=10, pady=5)
             # import
@@ -154,8 +225,8 @@ class App:
             # export
         self.db_export_frame = tk.CTkFrame(self.db_tab_frame)
         self.db_export_frame.grid(sticky='NEWS', row=1, column=0, padx=10, pady=5)
-        self.db_export_menu = tk.CTkOptionMenu(self.db_export_frame, values=[self.lang.to_sqlite, self.lang.to_tsv], width=180)
         self.db_export_label = tk.CTkLabel(self.db_export_frame, text=self.lang.export)
+        self.db_export_menu = tk.CTkOptionMenu(self.db_export_frame, values=[self.lang.to_sqlite, self.lang.to_tsv], width=180)
         self.db_export_button = tk.CTkButton(self.db_export_frame, text=self.lang.export, command=self.export_button)
         self.db_export_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=5)
         self.db_export_menu.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
@@ -201,23 +272,18 @@ class App:
         except IndexError:
             # No results
             pass
-        self.name_entry.entry.delete(0, tk.END)
-        self.nickname.entry.delete(0, tk.END)
-        self.year.entry.delete(0, tk.END)
+        self.edt_fcode_entry.delete(0, tk.END)
+        self.edt_name_entry.delete(0, tk.END)
+        self.edt_nickname_entry.delete(0, tk.END)
+        self.edt_year_entry.delete(0, tk.END)
         self.biography.textbox.delete(1.0, tk.END)
         # Refresh info tab
         self.info_self_label.configure(text=f'{self.selected_name}')
         self.info_fcode_label.configure(text=f'({self.selected_fcode})')
         self.info_year_label.configure(text=f'{self.selected_year}')
-        self.info_father_entry.entry.delete(0, tk.END)
-        self.info_father_entry.entry.insert(0,
-            self.db.fbook.get_father_name(self.selected_fcode))
-        self.info_mother_entry.entry.delete(0, tk.END)
-        self.info_mother_entry.entry.insert(0,
-            self.db.fbook.get_mother_name(self.selected_fcode))
-        self.info_spouse_entry.delete(0, tk.END)
-        self.info_spouse_entry.insert(0,
-            self.db.fbook.get_partner_name(self.selected_fcode))
+        self.info_father_data_label.configure(text=self.db.fbook.get_father_name(self.selected_fcode))
+        self.info_mother_data_label.configure(text=self.db.fbook.get_mother_name(self.selected_fcode))
+        self.info_spouse_data_label.configure(text=self.db.fbook.get_partner_name(self.selected_fcode))
 
         self.current_siblings = self.db.fbook.get_siblings_name(self.selected_fcode)
         self.current_siblings_fcodes = self.db.fbook.get_siblings_code(self.selected_fcode)
@@ -243,12 +309,14 @@ class App:
         for row_data, fnumber in rows_offspring:
             self.info_offspring_tree.tree.insert('', tk.END, values=(row_data, fnumber))
         
+        if self.selected_fcode != "None":
+            self.edt_fcode_entry.insert(0, self.selected_fcode)
         if self.selected_name != "None":
-            self.name_entry.entry.insert(0, self.selected_name)
+            self.edt_name_entry.insert(0, self.selected_name)
         if self.selected_nickname != "None":
-            self.nickname.entry.insert(0, self.selected_nickname)
+            self.edt_nickname_entry.insert(0, self.selected_nickname)
         if self.selected_year != "None":
-            self.year.entry.insert(0, self.selected_year)
+            self.edt_year_entry.insert(0, self.selected_year)
         if self.selected_biography != "None":
             self.biography.textbox.insert(1.0, self.selected_biography)
     
@@ -256,11 +324,11 @@ class App:
         """Return a row to insert in the SQLite DB from the data
         introduced in the add tab.
         """
-        fcode = self.fcode_entry_addt.entry.get()
-        name = self.name_entry_addt.entry.get()
-        nickname = self.nickname_addt.entry.get()
+        fcode = self.addt_fcode_entry.entry.get()
+        name = self.addt_name_entry.entry.get()
+        nickname = self.addt_nickname_entry.entry.get()
         biography = self.biography_addt.textbox.get(1.0, tk.END).strip()
-        year = self.year_addt.entry.get()
+        year = self.addt_year_entry.entry.get()
         result = (fcode, name, nickname, biography, year, "")
         if result[0:3] == ("", "", "", ""):
             return ("", "", "", "", "")
@@ -332,10 +400,12 @@ class App:
         self.select_tree_by_fcode(self.selected_fcode)
 
     def save_entries_edit(self):
+        new_fcode = self.edt_fcode_entry._entry.get()
         new_biography = self.biography.textbox.get('1.0', 'end')
-        new_name = self.name_entry.entry.get()
-        new_year = self.year.entry.get()
-        new_nickname = self.nickname.entry.get()
+        new_name = self.edt_name_entry.entry.get()
+        new_year = self.edt_year_entry.entry.get()
+        new_nickname = self.edt_nickname_entry.entry.get()
+        self.db.update_fcode(new_fcode)
         self.db.update_biography(self.selected_fcode, new_biography)
         self.db.update_name(self.selected_fcode, new_name)
         self.db.update_year_born(self.selected_fcode, new_year)
@@ -345,11 +415,11 @@ class App:
         self.refresh_table()
 
     def clear_widgets_add(self):
-        self.fcode_entry_addt.entry.delete(0, tk.END)
-        self.name_entry_addt.entry.delete(0, tk.END)
-        self.nickname_addt.entry.delete(0, tk.END)
+        self.addt_fcode_entry.entry.delete(0, tk.END)
+        self.addt_name_entry.entry.delete(0, tk.END)
+        self.addt_nickname_entry.entry.delete(0, tk.END)
         self.biography_addt.textbox.delete(1.0, tk.END)
-        self.year_addt.entry.delete(0, tk.END)
+        self.addt_year_entry.entry.delete(0, tk.END)
     
     def save_entries_add(self):
         print('save_entries_add')
@@ -438,6 +508,9 @@ class App:
 def launch(launch_data, database):
     root = tk.CTk()
     root.title(launch_data.params.software_name)
+    current_width = 1320
+    current_height = 900
+    root.geometry(f"{current_width}x{current_height}")
     root.resizable(False, False)
     app = App(root, launch_data, database)
     root.mainloop()

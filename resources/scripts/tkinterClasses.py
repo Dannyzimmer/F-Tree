@@ -12,7 +12,7 @@ class LabelWidget:
         self.label_width = label_width
         self.show_label = show_label
         # Frame
-        self.frame = tk.CTkFrame(self.root)
+        self.frame = tk.CTkFrame(self.root, fg_color='transparent')
         self.frame.grid(sticky='NWES', row=row, column=col, columnspan=2, padx=10, pady=5)
         if self.show_label == True:
             # Label

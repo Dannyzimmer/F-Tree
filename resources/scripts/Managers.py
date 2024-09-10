@@ -112,6 +112,34 @@ class ColorManager(GenericManager):
 
     def _get_color_file(self):
         return self.params.color_file
+    
+class WidgetStyleManager(GenericManager):
+    '''Class for managing widgets styles of the GUI. Attributes are the keys of
+    the selected dictionary.
+    '''
+    def __init__(self, parameter_manager: ParameterManager):
+        self.params = parameter_manager
+        json_to_load = self._get_widgets_file()
+        super().__init__(parameter_manager, json_to_load)
+
+    def _get_widgets_file(self):
+        return self.params.widgets_style_file
+    
+    def _lists_to_tuples(self, dictionary: dict):
+        result = {}
+        for k, v in dictionary.items():
+            if type(v) == list:
+                result[k] = tuple(v)
+            elif type(v) == dict:
+                result[k] = self._lists_to_tuples(v)
+            else:
+                result[k] = v
+        return result
+
+    def _add_attributes_from_dict(self, dict):
+        for key in dict:
+            setattr(self, key, self._lists_to_tuples(dict[key]))
+            print('WidgetStyleManager.', key, ' = ', self._lists_to_tuples(dict[key]))
 
 class FontManager(GenericManager):
     '''Class for managing fonts of the GUI. Attributes are the keys of the
@@ -205,12 +233,14 @@ class LaunchData:
         self.font_manager = FontManager(self.params)
         self.image_manager = ImageManager(self.params)
         self.recent_manager = RecentDBManager(self.params)
+        self.widget_style_manager = WidgetStyleManager(self.params)
 
     def refresh(self):
         self.params.refresh()
         self.lang_manager.refresh()
         self.color_manager.refresh()
         self.image_manager.refresh()
+        self.widget_style_manager.refresh()
 
 # p = ParameterManager('/home/dannyzimm/Documentos/programacion/fcodes_gui/resources/parameters.json')
 # l = LangManager(p)

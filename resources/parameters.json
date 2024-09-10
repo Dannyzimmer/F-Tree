@@ -9,6 +9,7 @@
     "color_file": "resources/style/colors.json",
     "font_file": "resources/style/fonts.json",
     "image_file": "resources/style/images.json",
+    "widgets_style_file": "resources/style/widgets.json",
     "language": "Espa\u00f1ol",
     "welcome_menu": "True",
     "num_recent_files": "10"

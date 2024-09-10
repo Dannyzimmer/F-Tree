@@ -2,7 +2,7 @@ import sqlite3
 import os
 import csv
 from resources.libs.fcodes.fcodes.libs.classes.FBook import FBook
-from resources.scripts.JsonManager import ParameterManager
+from resources.scripts.Managers import ParameterManager
 
 def create_table_from_tsv(tsv_file, sqlite_file, sqlite_table):
     # Connect to SQLite database (create if it doesn't exist)
