@@ -18,6 +18,7 @@ class WelcomeMenu(ctk.CTk):
         self.current_width = 600
         self.current_height = 400
         self.geometry(f"{self.current_width}x{self.current_height}")
+        self.resizable(width=False, height=False)
 
         # Frames
         self.left_frame = ctk.CTkFrame(self)

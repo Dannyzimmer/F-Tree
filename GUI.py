@@ -438,7 +438,7 @@ class App:
 def launch(launch_data, database):
     root = tk.CTk()
     root.title(launch_data.params.software_name)
-    root.resizable(True, True)
+    root.resizable(False, False)
     app = App(root, launch_data, database)
     root.mainloop()
 
