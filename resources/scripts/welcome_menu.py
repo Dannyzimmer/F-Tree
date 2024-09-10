@@ -46,7 +46,7 @@ class WelcomeMenu(ctk.CTk):
         icon_size = 27
         icon_dark = self.launch_data.image_manager.get_image("lang_icon_dark", height = icon_size, width = icon_size)
         self.language_icon = ctk.CTkLabel(self.left_frame, image=icon_dark, text="", height=icon_size, width=icon_size, bg_color='transparent', fg_color='transparent')
-        self.language_combobox = ctk.CTkComboBox(self.left_frame, values=self.launch_data.lang_manager.get_available_languages(), command=self.on_language_selection)
+        self.language_combobox = ctk.CTkComboBox(self.left_frame, values=self.launch_data.lang_manager.get_available_languages(), command=self.on_language_selection, state='readonly')
         self.language_icon.pack(pady=(10, 30), padx=(30, 10), side='left', anchor='se')
         self.language_combobox.pack(pady=(10, 30), side='left', anchor='se')
         self.language_combobox.set(self.launch_data.params.language)
