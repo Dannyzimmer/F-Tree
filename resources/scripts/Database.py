@@ -148,6 +148,9 @@ class Database:
     def close(self):
         self.cur.close()
         self.con.close()
+
+    def refresh(self):
+        self.fbook = FBook(self.db_path)
     
 class DatabaseTSV(Database):
     def __init__(self, tsv_path: str, parameter_manager: ParameterManager,

@@ -42,6 +42,10 @@ class App:
         self.tabview.add(edit_tab)
         self.tabview.add(add_tab)
         self.tabview.add(db_tab)
+        # self.tabview.set(add_tab)
+        self.tabview.set(info_tab)
+
+        self.active_tab = 'info_tab'
 
         # Frames
         self.left_frame = tk.CTkFrame(self.root)
@@ -260,18 +264,24 @@ class App:
 
         # self.info_siblings_label.grid(sticky='W', row=3, column=0, padx = 10, pady = 5, columnspan = 2)
         # self.name_entry_infot = LabelEntry(self.tabview.tab(info_tab), self.lang.father, 0, 0)
-        
-        self.tabview.set(info_tab)
 
     def on_tab_change(self):
         self.active_tab = self.tabview.get()
+        self.update_initial_fcode()
+
+    def update_initial_fcode(self):
         tabs = [self.launch_data.lang_manager.tab_edit, 
-             self.launch_data.lang_manager.tab_add]
-        if self.active_tab in tabs:
-            if self.active_tab == tabs[0]:
+                self.launch_data.lang_manager.tab_add]
+        if self.active_tab == tabs[0]:
+            fcode = self.edt_fcode_entry.get()
+            if fcode not in ['', None]:
                 self.initial_fcode = self.edt_fcode_entry.get()
-            else:
+            print(self.initial_fcode)
+        elif self.active_tab == tabs[1]:
+            fcode = self.edt_fcode_entry.get()
+            if fcode not in ['', None]:
                 self.initial_fcode = self.addt_fcode_entry.get()
+            print(self.initial_fcode)
 
     def on_generate_report(self):
         output_report = filedialog.asksaveasfile(mode='w', filetypes=[('PDF', '*.pdf')]).name
@@ -287,6 +297,7 @@ class App:
     def select_first_row(self):
         try:
             self.table.tree.selection_set(self.table.tree.get_children()[0])
+            self.update_initial_fcode()
         except IndexError:
             print('No results')
 
@@ -351,6 +362,7 @@ class App:
             self.edt_year_entry.insert(0, self.selected_year)
         if self.selected_biography != "None":
             self.edt_biography.textbox.insert(1.0, self.selected_biography)
+        self.update_initial_fcode()
 
     def set_editing_on(self):
         self.editing_a_field = True
@@ -447,6 +459,15 @@ class App:
         self.db.update_table_shown()
         self.load_table()
         self.select_tree_by_fcode(self.selected_fcode)
+        self.update_initial_fcode()
+
+    def is_fcode_in_database(self, fcode: str, exclude=[])-> bool:
+        database = [i.code for i in self.db.fbook.all_fcodes if i.code not in exclude]
+        return fcode in database
+
+    def show_error_fcode_exists(self, fcode: str):
+        message = self.launch_data.lang_manager.error_fcode_exists.replace('@1', fcode)
+        messagebox.showerror(title='', message=message)
 
     def save_entries_edit(self):
         new_fcode = self.edt_fcode_entry.get()
@@ -454,15 +475,22 @@ class App:
         new_name = self.edt_name_entry.get()
         new_year = self.edt_year_entry.get()
         new_nickname = self.edt_nickname_entry.get()
-        self.db.update_fcode(self.initial_fcode, new_fcode)
-        self.db.update_biography(self.selected_fcode, new_biography)
-        self.db.update_name(self.selected_fcode, new_name)
-        self.db.update_year_born(self.selected_fcode, new_year)
-        self.db.update_nickname(self.selected_fcode, new_nickname)
-        # for i in self.table.tree.get_children():
-        #     self.table.tree.delete(i)
-        self.refresh_table()
-        self.set_editing_off()
+        self.db.refresh()
+        if self.is_fcode_in_database(new_fcode, [self.initial_fcode]):
+            self.show_error_fcode_exists(new_fcode)
+            self.edt_fcode_entry.delete(0, tk.END)
+            self.edt_fcode_entry.insert(0, self.initial_fcode)
+        else:
+            self.db.update_fcode(self.initial_fcode, new_fcode)
+            self.db.update_biography(self.selected_fcode, new_biography)
+            self.db.update_name(self.selected_fcode, new_name)
+            self.db.update_year_born(self.selected_fcode, new_year)
+            self.db.update_nickname(self.selected_fcode, new_nickname)
+            # for i in self.table.tree.get_children():
+            #     self.table.tree.delete(i)
+            self.refresh_table()
+            self.db.refresh()
+            self.set_editing_off()
 
     def clear_widgets_add(self):
         self.addt_fcode_entry.delete(0, tk.END)
@@ -470,19 +498,23 @@ class App:
         self.addt_nickname_entry.delete(0, tk.END)
         self.addt_biography.textbox.delete(1.0, tk.END)
         self.addt_year_entry.delete(0, tk.END)
-    
+
     def save_entries_add(self):
-        print('save_entries_add')
         row = self.get_row_from_add_tab()
         if row != ('','','','','',''):
             if row[0] == "":
                 messagebox.showwarning(self.root, message = self.lang.empty_fcode_error)
             else:
-                self.selected_fcode = row[0]
-                self.db.insert_row(row)
-                self.refresh_table()
-                self.clear_widgets_add()
-                self.set_editing_off()
+                if self.is_fcode_in_database(row[0]):
+                    self.show_error_fcode_exists(row[0])
+                    self.addt_fcode_entry.delete(0, tk.END)
+                else:
+                    self.db.insert_row(row)
+                    self.refresh_table()
+                    self.clear_widgets_add()
+                    self.db.refresh()
+                    self.set_editing_off()
+                    self.selected_fcode = row[0]
     
     def delete_row_edit(self):
         message = f'{self.lang.del_confirmation} ({self.selected_fcode}).'
@@ -492,6 +524,7 @@ class App:
             self.refresh_table()
             self.select_first_row()
             self.refresh_selection()
+            self.db.refresh()
             print('row deleted')
 
     def get_selected_row(self):
@@ -535,7 +568,6 @@ class App:
             self.load_table()
             self.refresh_selection()
             
-
     def export_button(self):
         option = self.db_export_menu.get()
         if option == self.lang.to_sqlite:
@@ -560,6 +592,7 @@ class App:
             elif self.active_tab == self.launch_data.lang_manager.tab_add:
                 self.save_entries_add()
         if do_i_save == False:
+            self.clear_widgets_add()
             self.set_editing_off()
 
         

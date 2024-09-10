@@ -45,5 +45,6 @@
     "recent_files": "Recientes",
     "generate_tree": "Generar árbol",
     "generate_report": "Generar informe",
-    "warning_no_save": "Tienes campos editados sin guardar, ¿quieres guardarlos?"
+    "warning_no_save": "Tienes campos editados sin guardar, ¿quieres guardarlos?",
+    "error_fcode_exists": "¡El fcode @1 ya existe en la familia!"
 }

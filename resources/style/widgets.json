@@ -32,13 +32,13 @@
     "edit_tab": {
         "section_title": {
             "font": ["Arial", 16, "bold"],
-            "text_color": ["#868686", "#1e1e1e"]
+            "text_color": ["#868686", "#838383"]
         }
     },
     "add_tab": {
         "section_title": {
             "font": ["Arial", 16, "bold"],
-            "text_color": ["#868686", "#1e1e1e"]
+            "text_color": ["#868686", "#838383"]
         }
     }
 }

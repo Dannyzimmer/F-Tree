@@ -45,5 +45,6 @@
     "recent_files": "Recent files",
     "generate_tree": "Build tree",
     "generate_report": "Create report",
-    "warning_no_save": "You have unsaved changes. Do you want to save them?"
+    "warning_no_save": "You have unsaved changes. Do you want to save them?",
+    "error_fcode_exists": "The fcode @1 already exists in the family!"
 }
