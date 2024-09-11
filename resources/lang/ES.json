@@ -12,6 +12,7 @@
     "save": "Guardar",
     "save_as": "Guardar como",
     "create_new_db": "Crear nueva familia",
+    "new_family_filename": "nueva_familia.db",
     "exit": "Salir",
     "delete": "Eliminar",
     "spouse": "Cónyuge",

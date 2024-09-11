@@ -31,7 +31,7 @@ class WelcomeMenu(ctk.CTk):
         self.open_button.pack(pady=(30, 10), padx = (30,30), anchor='w')
 
         # New
-        self.create_button = ctk.CTkButton(self.left_frame, text=self.launch_data.lang_manager.new_family_btn, command=self.create_database, width=180)
+        self.create_button = ctk.CTkButton(self.left_frame, text=self.launch_data.lang_manager.new_family_btn, command=self.create_new_family, width=180)
         self.create_button.pack(pady=10, padx = (30,30), anchor='w')
 
         # Import
@@ -80,11 +80,12 @@ class WelcomeMenu(ctk.CTk):
         self.launch_data.params.write_param("language", selected_language)
         self.refresh()
 
-    def create_database(self):
+    def create_new_family(self):
         # Button Create new Family
         db_path = filedialog.asksaveasfile(
             filetypes=[(self.launch_data.lang_manager.sqlite_file, '*.db')],
-            title=self.launch_data.lang_manager.create_new_db
+            title=self.launch_data.lang_manager.create_new_db,
+            initialfile=self.launch_data.lang_manager.new_family_filename  # Establece el nombre predeterminado
             ).name
         print(db_path)
         database = DatabaseNEW(db_path, self.launch_data.params)
