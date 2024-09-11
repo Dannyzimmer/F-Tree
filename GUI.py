@@ -37,7 +37,7 @@ class App:
         edit_tab = self.lang.tab_edit
         add_tab = self.lang.tab_add
         info_tab = self.lang.tab_info
-        db_tab = self.lang.database
+        db_tab = self.lang.export
         self.tabview.add(info_tab)
         self.tabview.add(edit_tab)
         self.tabview.add(add_tab)
@@ -233,15 +233,7 @@ class App:
         #-----------------------------------------------------------------------
         self.db_tab_frame = tk.CTkFrame(self.tabview.tab(db_tab))
         self.db_tab_frame.grid(sticky='NEWS', row=0, column=0, padx=10, pady=5)
-            # import
-        self.db_import_frame = tk.CTkFrame(self.db_tab_frame)
-        self.db_import_frame.grid(sticky='NEWS', row=0, column=0, padx=10, pady=5)
-        self.db_import_menu = tk.CTkOptionMenu(self.db_import_frame, values=[self.lang.from_sqlite, self.lang.from_tsv], width=180)
-        self.db_import_label = tk.CTkLabel(self.db_import_frame, text=self.lang._import)
-        self.db_import_button = tk.CTkButton(self.db_import_frame, text=self.lang._import, command=self.import_button)
-        self.db_import_label.grid(sticky='NWS', row=0, column=0, padx=10, pady=5)
-        self.db_import_menu.grid(sticky='NWS', row=0, column=1, padx=10, pady=5)
-        self.db_import_button.grid(sticky='NWS', row=0, column=2, padx=10, pady=5)
+
             # export
         self.db_export_frame = tk.CTkFrame(self.db_tab_frame)
         self.db_export_frame.grid(sticky='NEWS', row=1, column=0, padx=10, pady=5)

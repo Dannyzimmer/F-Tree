@@ -21,7 +21,6 @@
     "offspring": "Descendencia",
     "siblings": "Hermanos",
     "parents": "Padres",
-    "database": "Base de datos",
     "_import": "Importar",
     "export": "Exportar",
     "from_tsv": "Desde TSV",
