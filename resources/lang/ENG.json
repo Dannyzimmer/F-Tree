@@ -4,6 +4,7 @@
     "nickname": "Nickname",
     "year": "Year of Birth",
     "biography": "Biography",
+    "create_new_db": "Create new family",
     "notes": "Notes",
     "table": "Data",
     "tab_edit": "Edit",

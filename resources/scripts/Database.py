@@ -151,7 +151,45 @@ class Database:
 
     def refresh(self):
         self.fbook = FBook(self.db_path)
-    
+
+class DatabaseNEW(Database):
+    def __init__(self, path_to_save: str, parameter_manager: ParameterManager):
+        self.params = parameter_manager
+        self.db_path = path_to_save
+        self._write_new_database_to_params()
+        self._build_database()
+        super().__init__(self.db_path)
+
+    def _write_new_database_to_params(self):
+        self.params.write_param("database", self.db_path)
+
+    def _build_database(self, sqlite_table = 'family'):
+        conn = sqlite3.connect(self.db_path)
+        cursor = conn.cursor()
+
+        # Create the 'family' table
+        cursor.execute(f'''
+            CREATE TABLE IF NOT EXISTS {sqlite_table} (
+                fcode TEXT PRIMARY KEY,
+                name TEXT,
+                nickname TEXT,
+                biography TEXT,
+                yearBorn INTEGER,
+                notes TEXT
+            )
+        ''')
+
+        # Insert values from the list into the 'family' table
+        fcode = '*'
+        cursor.execute('''
+            INSERT OR IGNORE INTO family (fcode)
+            VALUES (?)
+        ''', (fcode))
+
+        # Commit the transaction and close the connection
+        conn.commit()
+        conn.close()
+
 class DatabaseTSV(Database):
     def __init__(self, tsv_path: str, parameter_manager: ParameterManager,
                  database_filename: str = ''):

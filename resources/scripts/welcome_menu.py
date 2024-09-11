@@ -3,7 +3,7 @@ import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
 from resources.scripts.Managers import LaunchData
-from resources.scripts.Database import Database, DatabaseTSV, DatabaseFDATA
+from resources.scripts.Database import Database, DatabaseNEW, DatabaseTSV, DatabaseFDATA
 from resources.scripts.widgets import ImportNewNameDialog, FileSavedInDialog, RecentDBTable
 
 # Initialize customtkinter
@@ -81,8 +81,17 @@ class WelcomeMenu(ctk.CTk):
         self.refresh()
 
     def create_database(self):
-        # Function to handle creating a new database
-        messagebox.showinfo("Info", "Creating a new database...")
+        # Button Create new Family
+        db_path = filedialog.asksaveasfile(
+            filetypes=[(self.launch_data.lang_manager.sqlite_file, '*.db')],
+            title=self.launch_data.lang_manager.create_new_db
+            ).name
+        print(db_path)
+        database = DatabaseNEW(db_path, self.launch_data.params)
+        self.launch_data.recent_manager.add_file_to_recent_file(self.launch_data.params.database)
+        self.destroy()
+        import GUI
+        GUI.launch(self.launch_data, database)
 
     def open_family_menu(self):
         file_path = filedialog.askopenfilename(parent=self, 
