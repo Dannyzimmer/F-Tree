@@ -1,7 +1,7 @@
 import os
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
-from PIL import Image
+from PIL import ImageTk
 from resources.scripts.Managers import LaunchData
 from resources.scripts.Database import Database, DatabaseNEW, DatabaseTSV, DatabaseFDATA
 from resources.scripts.widgets import ImportNewNameDialog, FileSavedInDialog, RecentDBTable
@@ -159,8 +159,22 @@ class WelcomeMenu(ctk.CTk):
         self.destroy()
         self.__init__(self.launch_data)
 
+def is_darkmode_enabled(root: ctk.CTk)-> bool: #FIXME
+    current_theme = root._get_appearance_mode()
+    return True if current_theme == 'dark' else False
+
+def get_icon(root: ctk.CTk, launch_data: LaunchData)-> ImageTk: #FIXME
+    if is_darkmode_enabled(root):
+        icon = launch_data.image_manager.software_simple_icon_dark
+    else:
+        icon = launch_data.image_manager.software_simple_icon_light
+    return ImageTk.PhotoImage(file=icon)
+
 def launch(launch_data):
     app = WelcomeMenu(launch_data)
+    app.iconpath = get_icon(app, launch_data)
+    app.wm_iconbitmap()
+    app.iconphoto(False, app.iconpath)
     app.mainloop()
 
 if __name__ == "__main__":

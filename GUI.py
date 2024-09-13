@@ -10,7 +10,7 @@ from resources.scripts.html_report import HTMLReport
 # from resources.scripts.widgets import CloseOnEditingWarning# from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
 from resources.scripts.Managers import LaunchData
-from PIL import Image
+from PIL import Image, ImageTk
 from tkinter import filedialog
 import os
 
@@ -587,15 +587,24 @@ class App:
             self.clear_widgets_add()
             self.set_editing_off()
 
-        
 
-    # def on_closing(self):
-    #     print('--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------')
-    #     self.db.close()
-    #     self.root.destroy()
+def is_darkmode_enabled(root: tk.CTk)-> bool: #FIXME
+    current_theme = root._get_appearance_mode()
+    return True if current_theme == 'dark' else False
+
+def get_icon(root: tk.CTk, launch_data: LaunchData)-> ImageTk: #FIXME
+    if is_darkmode_enabled(root):
+        icon = launch_data.image_manager.software_simple_icon_dark
+    else:
+        icon = launch_data.image_manager.software_simple_icon_dark
+    return ImageTk.PhotoImage(file=icon)
 
 def launch(launch_data, database):
     root = tk.CTk()
+    root.iconpath = get_icon(root, launch_data)
+    root.wm_iconbitmap()
+    root.iconphoto(False, root.iconpath)
+
     root.title(launch_data.params.software_name)
     current_width = 1192
     current_height = 902
