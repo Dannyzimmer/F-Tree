@@ -139,7 +139,6 @@ class WidgetStyleManager(GenericManager):
     def _add_attributes_from_dict(self, dict):
         for key in dict:
             setattr(self, key, self._lists_to_tuples(dict[key]))
-            print('WidgetStyleManager.', key, ' = ', self._lists_to_tuples(dict[key]))
 
 class FontManager(GenericManager):
     '''Class for managing fonts of the GUI. Attributes are the keys of the

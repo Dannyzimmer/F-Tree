@@ -87,7 +87,6 @@ class WelcomeMenu(ctk.CTk):
             title=self.launch_data.lang_manager.create_new_db,
             initialfile=self.launch_data.lang_manager.new_family_filename  # Establece el nombre predeterminado
             ).name
-        print(db_path)
         database = DatabaseNEW(db_path, self.launch_data.params)
         self.launch_data.recent_manager.add_file_to_recent_file(self.launch_data.params.database)
         self.destroy()
@@ -101,7 +100,6 @@ class WelcomeMenu(ctk.CTk):
                             ])
         if file_path:
             if os.path.splitext(file_path)[1] in ['.db', '.DB']:
-                print(file_path)
                 self.launch_data.params.write_param("database", file_path)
                 self.launch_data.refresh()
                 self.launch_gui()

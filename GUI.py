@@ -209,7 +209,14 @@ class App:
         # Siblings
         columns = [self.lang.name, self.lang.sibling_number]
         siblings = ()
-        self.info_siblings_tree = LabelTable(self.info_main_frame, self.lang.siblings, 8, 0, columns=columns, data=siblings, show_label = True, **info_style_section)
+        self.info_siblings_tree = LabelTable(
+            self.info_main_frame, 
+            self.lang.siblings, 8, 0,
+            columns=columns, data=siblings, 
+            launch_data=self.launch_data,
+            show_label = True, 
+            **info_style_section
+            )
         self.info_siblings_tree.label.grid(sticky='W')
         self.info_siblings_tree.tree.column(self.lang.name, width=250)
         self.info_siblings_tree.tree.configure(height=8)
@@ -220,8 +227,12 @@ class App:
         # Offspring
         columns_off = [self.lang.name, self.lang.offspring_number]
         siblings_off = ()
-        self.info_offspring_tree = LabelTable(self.info_main_frame, self.lang.offspring, 9, 0, 
-            columns=columns_off, data=siblings_off, show_label = True, **info_style_section)
+        self.info_offspring_tree = LabelTable(
+            self.info_main_frame, self.lang.offspring, 9, 0, 
+            columns=columns_off, launch_data=self.launch_data,
+            data=siblings_off, show_label = True, 
+            **info_style_section
+            )
         self.info_offspring_tree.label.grid(sticky='W')
         self.info_offspring_tree.tree.column(self.lang.name, width=250)
         self.info_offspring_tree.tree.configure(height=8)
@@ -268,12 +279,10 @@ class App:
             fcode = self.edt_fcode_entry.get()
             if fcode not in ['', None]:
                 self.initial_fcode = self.edt_fcode_entry.get()
-            print(self.initial_fcode)
         elif self.active_tab == tabs[1]:
             fcode = self.edt_fcode_entry.get()
             if fcode not in ['', None]:
                 self.initial_fcode = self.addt_fcode_entry.get()
-            print(self.initial_fcode)
 
     def on_generate_report(self):
         output_report = filedialog.asksaveasfile(mode='w', filetypes=[('PDF', '*.pdf')]).name
@@ -394,6 +403,7 @@ class App:
             )
         self.table = LabelTable(self.left_frame, table_name, 0, 0,
                                 columns=table_columns, data=table_data,
+                                launch_data=self.launch_data,
                                 image=icon, compound='left')
         self.table.tree.bind('<<TreeviewSelect>>', self.refresh_selection)
         # self.table.tree.selection_set(self.table.tree.get_children()[0])

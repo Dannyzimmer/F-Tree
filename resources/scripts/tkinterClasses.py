@@ -2,6 +2,11 @@ import customtkinter as tk
 from tkinter import ttk
 import re
 import pandas as pd
+from resources.scripts.Managers import LaunchData
+
+def is_darkmode_enabled(root: tk.CTk)-> bool: #FIXME
+    current_theme = root._get_appearance_mode()
+    return True if current_theme == 'dark' else False
 
 class LabelWidget:
     def __init__(self, root, label_text, row, col, label_width=10, show_label=True, **kwargs):
@@ -41,11 +46,15 @@ class LabelDropdown(LabelWidget):
         self.dropdown.grid(sticky='E', row=0, column=2, padx=5, pady=5)
 
 class LabelTable(LabelWidget):
-    def __init__(self, root, label_text, row, col, columns, data, label_width=10, show_label=True, **kwargs):
-        super().__init__(root, label_text, row, col, label_width, show_label, **kwargs)
+    def __init__(self, root, label_text, row, col, columns, data,
+                 label_width=10, show_label=True, launch_data: LaunchData=None, 
+                 **kwargs):
+        super().__init__(root, label_text, row, col, label_width, show_label, 
+                         **kwargs)
         # Create Treeview widget
         self.tree = ttk.Treeview(self.frame, columns=columns, show='headings')
         self.tree.grid(sticky='NEWS', row=1, column=0, columnspan=3, padx=10, pady=5)
+        self.launch_data = launch_data
         self.data = data
 
         # Define columns
@@ -58,7 +67,9 @@ class LabelTable(LabelWidget):
             self.tree.insert('', tk.END, values=row_data)
 
         # Add scrollbar
-        self.scrollbar = ttk.Scrollbar(self.frame, orient="vertical", command=self.tree.yview)
+        self.scrollbar = tk.CTkScrollbar(
+            self.frame, orientation="vertical", command=self.tree.yview
+            )
         self.tree.configure(yscroll=self.scrollbar.set)
         self.scrollbar.grid(sticky='NS', row=1, column=4)
 
