@@ -21,6 +21,7 @@ class FBook:
         self.max_depth = self.get_max_depth()
         self.max_distance = self.get_max_generation()
         self.all_fcodes = [FcodeManager(i) for i in self.DATA.keys()]
+        self.oc = self.get_oc()
 
     def get_data_from_SQLite_db(self) -> dict:
         self.con = sqlite3.connect(self.DATA_path)
@@ -201,6 +202,15 @@ class FBook:
             if parbool == codes[0]:
                 return codes[1].fcode.code
         return 'NA'
+    
+    def get_oc(self) -> str:
+        '''
+        Return the origin of coordinates. 
+        '''
+        for i, f in self.DATA.items():
+            fcode = f.fcode
+            if fcode.type == '*':
+                return fcode.code
 
     def fbool_search(self, code: str) -> str:
         '''First booleanize a code, then search it in the cleaned DATA, 
@@ -219,7 +229,7 @@ class FBook:
         return result
     
     def fcode_multiple_search(self, fcodes: list) -> list:
-        'Return input fcodes present in the registy.'
+        'Return input fcodes present in the registry.'
         result = []
         for code in fcodes:
             if code in [i for i in self.DATA.keys()]:
@@ -386,10 +396,14 @@ class FBook:
             prediction.append(sex_switched)
             prediction.append(fcode.get_boolcode(sex_switched))
         if fcode.type == 'C':
+            if fcode.depth == 2:
+                return [self.oc]
             return [fcode[0:-1]]
         if fcode.has_any_parent() == True:
             prediction = self.add_parbools_to_list(prediction)
-        return [i for i in prediction]
+        if fcode.type == '*':
+            prediction.append('*C')
+        return prediction
     
     def get_partner_code(self, code: str) -> str:
         'Input a fcode, returns the fcode of its partner or NA.'
@@ -446,6 +460,8 @@ class FBook:
                                fcode[0:-1] + 'h']
         if fcode.has_any_parent() == True:
             result = self.add_parbools_to_list(result)
+        if fcode.type == 'C':
+            result = result + [fcode.linagecode + i for i in ['A', 'O', 'H']]
         return result
 
     def get_siblings_code(self, code: str) -> list:

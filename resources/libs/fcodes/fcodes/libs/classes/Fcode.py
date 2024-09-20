@@ -210,12 +210,12 @@ class FcodeManager:
         return ''.join(layers[0:-1] + switched_layer)
 
     def get_parbool(self, fcode = None):
-        '''Boleanize only P's and M's. E.g.: *MP1M2O3 --> *MPMO3'''
+        '''Boleanize only P's, M's and C's. E.g.: *MP1M2O3C3 --> *MPMO3C'''
         new_input = False if fcode == None else True 
         code = fcode if new_input else self.code
         layers = self.split_layers(code) if new_input else self.layers
         for index, value in enumerate(layers):
-                if value[0] in ['P', 'M']:
+                if value[0] in ['P', 'M', 'C']:
                     layers[index] = self.get_f_bool(value)
         return ''.join(layers)
 
