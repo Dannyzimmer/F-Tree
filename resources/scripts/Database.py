@@ -74,7 +74,12 @@ class Database:
         return len(self.cur.description)
 
     def get_table_shown(self):
-        code = f"""SELECT {self.col_filter} FROM family"""
+        code = f"""
+        SELECT {self.col_filter} FROM family
+        ORDER BY
+            REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, 'Á', 'A'), 'É', 'E'), 'Í', 'I'), 'Ó', 'O'), 'Ú', 'U'), 'Ñ', 'N')
+            COLLATE NOCASE;
+        """
         result = list(self.cur.execute(code))
         return result
 
