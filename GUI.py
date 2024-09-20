@@ -593,10 +593,12 @@ def is_darkmode_enabled(root: tk.CTk)-> bool: #FIXME
     return True if current_theme == 'dark' else False
 
 def get_icon(root: tk.CTk, launch_data: LaunchData)-> ImageTk: #FIXME
-    if is_darkmode_enabled(root):
-        icon = launch_data.image_manager.software_simple_icon_dark
-    else:
-        icon = launch_data.image_manager.software_simple_icon_dark
+    # if is_darkmode_enabled(root):
+    #     icon = launch_data.image_manager.software_simple_icon_dark
+    # else:
+    #     icon = launch_data.image_manager.software_simple_icon_dark
+    key = launch_data.params.icon
+    icon = launch_data.image_manager.__dict__[key]
     return ImageTk.PhotoImage(file=icon)
 
 def launch(launch_data, database):
