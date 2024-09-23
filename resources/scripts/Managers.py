@@ -2,11 +2,27 @@ import json
 import os
 from customtkinter import CTkImage
 from PIL import Image
+import sys
+
+def get_resource_path(relative_path):
+    """Get the absolute path to a resource, works for PyInstaller and
+    development.
+    """
+    if getattr(sys, 'frozen', False):
+        base_path = os.path.dirname(sys._MEIPASS)
+    else:
+        base_path = os.path.dirname(
+            os.path.dirname(
+            os.path.dirname(os.path.abspath(__file__))
+                )
+            )
+    result = os.path.join(base_path, relative_path)
+    return os.path.normpath(result)
 
 def load_json(json_file):
-    with open(json_file) as f:
+    with open(get_resource_path(json_file)) as f:
         return json.load(f)
-
+    
 class JsonManager:
     def __init__(self, json_file):
         '''Class for managing a JSON file. Attributes are the keys of the 
@@ -164,7 +180,7 @@ class ImageManager(GenericManager):
 
     def _add_attributes_from_dict(self, dict):
         for key in dict:
-            img_path = os.path.realpath(self.params.image_dir + '/' + dict[key])
+            img_path = get_resource_path(self.params.image_dir + '/' + dict[key])
             setattr(self, key, img_path)
 
     def get_image(self, image_name, width = 15, height = 15)-> CTkImage:
@@ -192,7 +208,7 @@ class RecentDBManager(GenericManager):
         result = []
         data : dict = load_json(self.params.recent_database_files)
         for v in list(data.values()):
-            result.append(v)
+            result.append(get_resource_path(v))
         return result
     
     def get_files_dic(self)-> dict:
@@ -221,7 +237,8 @@ class RecentDBManager(GenericManager):
         if len(self.recent_paths) > int(self.params.num_recent_files):
             self.recent_paths = self.recent_paths[0:int(self.params.num_recent_files)]
         self.update_files_dic()
-        with open(self.params.recent_database_files, 'w') as f:
+        recent_db_file = get_resource_path(self.params.recent_database_files)
+        with open(recent_db_file, 'w') as f:
             json.dump(self.file_dic, f, indent = 4)
 
 class LaunchData:
