@@ -1,5 +1,5 @@
 {
-    "software_name": "Family Tree",
+    "software_name": "F-Tree",
     "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/familia.db",
     "default_database_dir": "resources/database",
     "recent_database_files": "resources/database/recent.json",
