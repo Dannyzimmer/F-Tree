@@ -12,7 +12,12 @@ a = Analysis(
         ("resources/lang/*", "lang"),
         ("resources/style/*", "style")
     ],
-    hiddenimports=['PIL._tkinter_finder', '_tkinter'],
+    hiddenimports=[
+        'PIL._tkinter_finder',
+        '_tkinter',
+        'PySide6',
+        'weasyprint'
+    ],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
