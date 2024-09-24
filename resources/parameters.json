@@ -1,6 +1,6 @@
 {
     "software_name": "F-Tree",
-    "database": "/home/dannyzimm/Documentos/programacion/fcodes_gui/familia.db",
+    "database": "examples/family_example_3.db",
     "default_database_dir": "resources/database",
     "recent_database_files": "resources/database/recent.json",
     "language_dir": "resources/lang/",
@@ -10,7 +10,7 @@
     "font_file": "resources/style/fonts.json",
     "image_file": "resources/style/images.json",
     "widgets_style_file": "resources/style/widgets.json",
-    "language": "Espa\u00f1ol",
+    "language": "English",
     "welcome_menu": "True",
     "num_recent_files": "10",
     "icon": "software_full_icon_dark"
