@@ -1,4 +1,5 @@
-# Fcodes GUI
+# <img src="resources/img/fcode_tree_full_icon_dark_mode.png" width="60" style="margin-right: 10px;"/> F-Tree
+
 
 F-Tree is a graphical user interface (GUI) for managing and visualizing genealogical data using the Fcode method, a system for encoding kinship relations described by Pérez-Rodríguez et al.. With F-Tree, you can easily create, edit, import, and expand family trees, allowing you to explore and understand your family connections in an efficient and user-friendly way.
 
@@ -33,9 +34,9 @@ F-Tree is specifically designed to facilitate working with Fcodes. Here are some
 - **Preserve your family history**: F-Tree enables you to store detailed individual information for each family member in the database, including names, nicknames, birth dates, and biographies. As an open-source software solution, F-Tree ensures that both **the encoding algorithm and the data formats are transparent and accessible**, empowering you to maintain your family's legacy with confidence and flexibility.
 
 # Installation
-To install F-Tree, follow these simple steps:
 
 ## From release
+To install F-Tree, follow these simple steps:
 
 1. **Download the Software**: Download the latest release of F-Tree corresponding to your operating system from this GitHub repository. The software is distributed as a compressed ZIP file.
     - Download for Linux.
@@ -49,9 +50,9 @@ For users who prefer to set up F-Tree in a more controlled environment, the next
 
 If you encounter any issues during installation, feel free to open an issue on this repository.
 
-# Development environment
+## Creating a development environment
 
-## Creating a conda environment
+### Conda environment
 
 ```sh
 conda create -n fcodes_gui python=3.10
@@ -60,7 +61,7 @@ conda install pango
 python3 -m pip install -r requirements.txt
 ```
 
-## Creating a virtual environment
+### Virtual environment
 
 ```sh
 apt install -y pango1.0-tools tk
@@ -69,15 +70,15 @@ python3 -m .venv venv
 python3 -m pip install -r requirements.txt
 ```
 
-# Docker image
+## Using a Docker image
 
-## Building
+### Building
 
 ```sh
 docker build ./ -t fcodes_gui
 ```
 
-## Running
+### Running
 
 Replace `$(pwd)` by the path to the host directory you want to have available inside the Docker image:
 
