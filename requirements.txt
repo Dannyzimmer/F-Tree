@@ -7,6 +7,7 @@ pandas==2.2.2
 pdfkit==1.0.0
 pillow==10.4.0
 pip==24.2
+pyinstaller==6.10.0
 python-dateutil==2.9.0.post0
 pytz==2024.1
 setuptools==59.6.0
