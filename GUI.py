@@ -287,6 +287,17 @@ class App:
     def on_generate_report(self):
         output_report = filedialog.asksaveasfile(mode='w', filetypes=[('PDF', '*.pdf')]).name
         HTMLReport(self.table.tree).save_report_to_pdf(output_report)
+
+        try:
+            import subprocess
+            if os.name == 'posix':  # Unix-like OS (Linux, macOS)
+                subprocess.run(['xdg-open', output_report])
+            elif os.name == 'nt':  # Windows
+                subprocess.run(['start', output_report], shell=True)
+            else:
+                print("Unsupported OS.")
+        except Exception as e:
+            print(f"Failed to open PDF: {e}")
     
     def on_generate_tree(self):
         output_tree = filedialog.asksaveasfile(mode ='w', filetypes =[('PDF', '*.pdf')]).name
