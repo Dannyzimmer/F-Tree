@@ -5,6 +5,7 @@ from PIL import ImageTk
 from resources.scripts.Managers import LaunchData
 from resources.scripts.Database import Database, DatabaseNEW, DatabaseTSV, DatabaseFDATA
 from resources.scripts.widgets import ImportNewNameDialog, FileSavedInDialog, RecentDBTable
+from resources.scripts.utils import get_version
 
 # Initialize customtkinter
 ctk.set_appearance_mode("dark")  # Modes: "System" (standard), "Dark", "Light"
@@ -14,7 +15,7 @@ class WelcomeMenu(ctk.CTk):
     def __init__(self, launch_data: LaunchData):
         super().__init__()
         self.launch_data = launch_data
-        self.title(self.launch_data.params.software_name)
+        self.title(self.launch_data.params.software_name + get_version())
         self.current_width = 600
         self.current_height = 400
         self.geometry(f"{self.current_width}x{self.current_height}")
