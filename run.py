@@ -17,8 +17,13 @@ def get_resource_path(relative_path):
 parameter_path = get_resource_path('resources/parameters.json')
 parameter = ParameterManager(parameter_path)
 
-EntrypoingManager(
-    parameter_manager = parameter
-    )
+# Set the path to include the bundled Graphviz binaries
+if getattr(sys, 'frozen', False):  # If running as a bundled app
+    # Get the directory of the bundled executable
+    bundle_dir = sys._MEIPASS
+    
+    # Add the Graphviz bin folder to the PATH
+    graphviz_bin_path = os.path.join(bundle_dir, 'graphviz_bin')
+    os.environ["PATH"] += os.pathsep + graphviz_bin_path
 
-# DebugEntrypointManager(parameter_manager = parameter)
+EntrypoingManager(parameter_manager = parameter)

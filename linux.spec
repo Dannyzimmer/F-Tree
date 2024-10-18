@@ -1,16 +1,18 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-
 a = Analysis(
     ['run.py'],
     pathex=[],
     binaries=[],
     datas=[
         ("resources/parameters.json", "."),
+        ("resources/version", "."),
         ("resources/database/*", "database"),
         ("resources/img/*", "img"),
         ("resources/lang/*", "lang"),
-        ("resources/style/*", "style")
+        ("resources/style/*", "style"),
+        ("examples", "examples"),
+        ("LICENSE", ".")
     ],
     hiddenimports=[
         'PIL._tkinter_finder',
@@ -37,7 +39,7 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    console=True,
+    console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
@@ -53,5 +55,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='run',
+    name='bundle_linux',
 )

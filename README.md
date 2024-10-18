@@ -1,7 +1,6 @@
-# <img src="resources/img/fcode_tree_full_icon_dark_mode.png" width="60" style="margin-right: 10px;"/> F-Tree
+# <img src="resources/img/fcode_tree_full_icon_dark_mode.png" width="60" style="margin-right: 10px;"/> F-Tree [![license](https://img.shields.io/badge/LICENSE-MIT-blue)](https://github.com/Dannyzimmer/F-Tree)
 
-
-F-Tree is a graphical user interface (GUI) for managing and visualizing genealogical data using the Fcode method, a system for encoding kinship relations described by Pérez-Rodríguez et al.. With F-Tree, you can easily create, edit, import, and expand family trees, allowing you to explore and understand your family connections in an efficient and user-friendly way.
+F-Tree is a graphical user interface (GUI) for managing and visualizing genealogical data using the [Fcode method](https://github.com/Dannyzimmer/fcodes, a system for encoding kinship relations described by Pérez-Rodríguez et al.. With F-Tree, you can easily create, edit, import, and expand family trees, allowing you to explore and understand your family connections in an efficient and user-friendly way.
 
 ![F-Tree interface](resources/docs/img/main_menu.png)
 
@@ -36,21 +35,26 @@ F-Tree is specifically designed to facilitate working with Fcodes. Here are some
 # Installation
 
 ## From release
+
 To install F-Tree, follow these simple steps:
 
-1. **Download the Software**: Download the latest release of F-Tree corresponding to your operating system from this GitHub repository. The software is distributed as a compressed ZIP file.
-    - Download for Linux.
-    - Download for Windows. 
+1. **Download the Software**: Download the latest release of F-Tree corresponding to your operating system from this GitHub repository. The software is distributed as a compressed ZIP file. The Windows version includes Graphviz but the Linux version does not, so to use the "Build tree" functionality you need to install it.
+    - Download for Linux: [v1.0.0](https://github.com/Dannyzimmer/F-Tree/releases/download/v1.0.0/ftree_linux_v1.0.0.zip)
+    - Download for Windows: [v1.0.0](https://github.com/Dannyzimmer/F-Tree/releases/download/v1.0.0/ftree_windows_v1.0.0.zip)
 
 2. **Extract the ZIP File**: Once the download is complete, locate the ZIP file and extract its contents to a directory of your choice. This will create a single directory containing all the necessary files for F-Tree to function.
 
 3. **Run the Application**: Navigate to the extracted directory and locate the executable file `F-Tree`. Double-click on it to launch the application.
 
-For users who prefer to set up F-Tree in a more controlled environment, the next section will cover how to install it by creating a Conda environment, a venv, or using a Docker image.
+For users who prefer to set up F-Tree in a more controlled environment, the next section will cover how to install it by creating a Conda environment, a venv, or using a the official [Docker image](https://hub.docker.com/r/hlfernandez/ftree).
 
 If you encounter any issues during installation, feel free to open an issue on this repository.
 
 ## Creating a development environment
+
+### VS Code Dev Container
+
+The easiest way is using a VS Code Dev Container using the `.devcontainer` folder provided. Simply use VS Code to open the project folder in a Dev Container and wou will get a working environment.
 
 ### Conda environment
 
@@ -75,7 +79,7 @@ python3 -m pip install -r requirements.txt
 ### Building
 
 ```sh
-docker build ./ -t fcodes_gui
+docker build ./ -t ftree
 ```
 
 ### Running
@@ -83,5 +87,5 @@ docker build ./ -t fcodes_gui
 Replace `$(pwd)` by the path to the host directory you want to have available inside the Docker image:
 
 ```sh
-xhost + && docker run --rm -ti -e USERID=$UID -e USER=$USER -e DISPLAY=$DISPLAY -v /var/db:/var/db:Z -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/developer/.Xauthority -v "$(pwd):/data" -w /data fcodes_gui
+xhost + && docker run --rm -ti -e USERID=$UID -e USER=$USER -e DISPLAY=$DISPLAY -v /var/db:/var/db:Z -v /tmp/.X11-unix:/tmp/.X11-unix -v $HOME/.Xauthority:/home/developer/.Xauthority -v "$(pwd):/data" -w /data ftree
 ```

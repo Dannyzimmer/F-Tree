@@ -7,6 +7,7 @@ from resources.scripts.tkinterClasses import LabelEntry, LabelDropdown, LabelTex
 from resources.scripts.fcodesClasses import FamilyTreeTreeview
 from resources.libs.fcodes.fcodes.libs.classes.Fcode import FcodeManager
 from resources.scripts.html_report import HTMLReport
+from resources.scripts.utils import get_version
 # from resources.scripts.widgets import CloseOnEditingWarning# from resources.scripts.autocombobox import AutocompleteCombobox
 from resources.scripts.autoentry import AutocompleteEntry
 from resources.scripts.Managers import LaunchData
@@ -628,7 +629,7 @@ def launch(launch_data, database):
     root.wm_iconbitmap()
     root.iconphoto(False, root.iconpath)
 
-    root.title(launch_data.params.software_name)
+    root.title(launch_data.params.software_name + get_version())
     current_width = 1192
     current_height = 902
     root.geometry(f"{current_width}x{current_height}")
