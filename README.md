@@ -1,6 +1,6 @@
 # <img src="resources/img/fcode_tree_full_icon_dark_mode.png" width="60" style="margin-right: 10px;"/> F-Tree [![license](https://img.shields.io/badge/LICENSE-MIT-blue)](https://github.com/Dannyzimmer/F-Tree)
 
-F-Tree is a graphical user interface (GUI) for managing and visualizing genealogical data using the [Fcode method](https://github.com/Dannyzimmer/fcodes, a system for encoding kinship relations described by Pérez-Rodríguez et al.. With F-Tree, you can easily create, edit, import, and expand family trees, allowing you to explore and understand your family connections in an efficient and user-friendly way.
+F-Tree is a graphical user interface (GUI) for managing and visualizing genealogical data using the [Fcode method](https://github.com/Dannyzimmer/fcodes), a system for encoding kinship relations described by Pérez-Rodríguez et al.. With F-Tree, you can easily create, edit, import, and expand family trees, allowing you to explore and understand your family connections in an efficient and user-friendly way.
 
 ![F-Tree interface](resources/docs/img/main_menu.png)
 
